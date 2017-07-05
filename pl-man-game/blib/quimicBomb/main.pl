@@ -50,9 +50,7 @@
 %
 % Creates a mine that will explode when two cycles of
 % execution have passed since the mine has been dropped.
-% The explosion will destroy everything except surrounding
-% dots ('.') in 1 cell of distance from the mine.
-%
+% The explosionAle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :-module(quimicBomb, [quimicBomb/1, quimicBomb/5, gas/1, gas/4]).
 :-dynamic d_quimicBombStatus/5. %---mineStatus
