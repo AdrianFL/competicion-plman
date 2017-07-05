@@ -30,3 +30,5 @@
 
 lang_message(quimicBomb, quimic_bomb_bad_parameters, 'ERROR: Parametros incorrectos inicializando bQ/1 para el objeto con OID: ').
 lang_message(quimicBomb, gas_bad_parameters, 'ERROR: Parametros incorrectos inicializando gas/2 para el objeto con OID: ').
+lang_message(quimicBomb, quimic_bomb_incorrect_instantiation, 'ERROR: quimicBomb/5 no ha sido correctamente instanciado para el objeto con OID: ').
+lang_message(quimicBomb, cicles_left_for_explosion, 'BOMBA QUÍMICA: Ciclos restantes para liberar el gas: ').

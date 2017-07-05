@@ -1,5 +1,18 @@
 -----Bomba quimica (estatica, genera gas cada X tiempo)
+
+-> Pasos
+		- Cuenta atrás de la bomba química para explotar y liberar gases
+		- Generar gas alrededor de la bomba química
+		- Generarlo en un radio que atraviesa paredes
+
+			//opcional
+		- Hacer el gas expansivo
+		- Que pinte los puntos de manera diferente para que se vean debajo, igual con objetos
+		- Diferentes tipos de gases
+
+
 -Máscara de gas, permite sobrevivir al gas, es un objeto equipable (X turnos).
+
 -----Tanque armado: conjunto de enemigos de metal, que se mueven de lado a lado, con un punto débil. Dispara proyectiles que se marcan en el mapa con una X, y luego caen generando una explosión.
 -Enemigo normal que se mueve y dispara como el arquero.
 -Pistola que dispara como el arquero.
