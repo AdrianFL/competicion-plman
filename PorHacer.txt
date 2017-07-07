@@ -1,13 +1,13 @@
 -----Bomba quimica (estatica, genera gas cada X tiempo)
 
 -> Pasos
-		- Cuenta atrás de la bomba química para explotar y liberar gases
+		(HECHO)- Cuenta atrás de la bomba química para explotar y liberar gases
 		- Generar gas alrededor de la bomba química
 		- Generarlo en un radio que atraviesa paredes
 
 			//opcional
 		- Hacer el gas expansivo
-		- Que pinte los puntos de manera diferente para que se vean debajo, igual con objetos
+		(HECHO // sin tener en cuenta objetos, solo cocos o vacío)- Que pinte los puntos de manera diferente para que se vean debajo, igual con objetos
 		- Diferentes tipos de gases
 
 

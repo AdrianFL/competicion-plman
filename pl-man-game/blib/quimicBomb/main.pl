@@ -52,26 +52,27 @@
 % execution have passed since the mine has been dropped.
 % The explosionAle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:-module(quimicBomb, [quimicBomb/1, quimicBomb/5, gas/1, gas/4]).
-:-dynamic d_quimicBombStatus/5. %---mineStatus
-:- dynamic d_gasStatus/3. %---explosionStatus
+:-module(quimicBomb, [quimicBomb/1, quimicBomb/6, gas/1, gas/5]).
+:-dynamic d_quimicBombStatus/6. %---mineStatus
+:-dynamic d_gasStatus/4. %---explosionStatus
 
 %%%
 %%% Quimic Bomb Initialization
 %%%
 %
 
-quimicBomb(init,OID,TIME,WAVE,L_PARAMS):-
+quimicBomb(init,OID,TIME,WAVE,GAS_TIME,L_PARAMS):-
 	integer(OID),
 	integer(OID),
 	integer(TIME), TIME >= 1, 
 	integer(WAVE), WAVE >= 0,
+	integer(GAS_TIME), GAS_TIME >= 1, 
 	is_list(L_PARAMS),
-	retractall(d_quimicBombStatus(OID, _,_,_,_)),
-	assert(d_quimicBombStatus(OID, ready, TIME, WAVE, L_PARAMS)), !.
+	retractall(d_quimicBombStatus(OID, _,_,_,_,_)),
+	assert(d_quimicBombStatus(OID, ready, TIME, WAVE, GAS_TIME, L_PARAMS)), !.
 
 %Initialization error message
-quimicBomb(init, OID, _, _, _):-
+quimicBomb(init, OID, _, _, _, _):-
         'pl-man':lang_message(quimicBomb, quimic_bomb_bad_parameters, MSG),
 	maplist(user:write, [MSG, OID, '\n']).
 
@@ -79,49 +80,70 @@ quimicBomb(init, OID, _, _, _):-
 %%% quimic bomb behaviour
 %%%
 
+%%Si la bomba está acabada, no debe de hacer nada.
+quimicBomb(OID):-
+	d_quimicBombStatus(OID, finished, _, _, _, _).
+
+
 %% Si la bomba ha sido activada, explota (se pone un * encima y pasa a ser atravesable)
 quimicBomb(OID):-
-	d_quimicBombStatus(OID, activated, TIME, WAVE, L_PARAMS)),
-	%%Se coge la localización de la bomba
-	'pl-man':entityLocation(OID, X, Y, _), !,
+	d_quimicBombStatus(OID, activated, TIME, WAVE, GAS_TIME, L_PARAMS),!,
 
-	%%Verificamos qué objeto hay colocado en el mapa para dibujar el gas según lo que haya
+	%% Se coge la localización de la bomba
+	'pl-man':entityLocation(OID, X, Y, _),
+
+	%% Verificamos qué objeto hay colocado en el mapa para dibujar el gas según lo que haya
   'pl-man':getDMap(Map),
   'pl-man':getCellContent(X, Y, Map, WHAT),	
 
-	%%Los 3 ifs que determinan el dibujo del gas
+	%% Los 3 ifs que determinan el dibujo del gas
 	(WHAT == '.' -> Format = '*' , App = [appearance(attribs(bold, yellow, red))] 
 	; (WHAT == ' '-> Format = '˞' ,  App = [appearance(attribs(bold, white, red))]
-	; Format = '~' ,  App = [appearance(attribs(bold, blue, red))])),
+	; Format = '~' ,  App = [appearance(attribs(bold, blue, red))])), 
 	
-	%%Creación del gas inicial
+	%% Creación del gas inicial
   'pl-man':createGameEntity(GAS_ID, Format, mortal, X, Y, active, gas, App),
 
+  maplist(user:write, ['Soy activated y echo gases (jeje) hola Ale -> /\\', '\n']), !,
+
 	%%Inicialización del gas inicial
-  gas(init, GAS_ID, WAVE, L_PARAMS), !.
+  gas(init, GAS_ID, GAS_TIME, WAVE, L_PARAMS), !,
 
-%%Si el tiempo llega a 1, activa la bomba y explota en el siguiente turno
+	%%Dejamos la bomba química en un estado inerte
+	retract(d_quimicBombStatus(OID, _,_,_,_,_)),
+	assert(d_quimicBombStatus(OID, finished, TIME, WAVE, GAS_TIME, L_PARAMS)), !.
+
+
+%% Si el tiempo llega a 0, activa la bomba y explota en el siguiente turno
 quimicBomb(OID):-
-	d_quimicBombStatus(OID,ready, TIME, WAVE, L_PARAMS)),!,
-	TIME=1,!,
-	retractall(d_quimicBombStatus(OID, _,_,_,_)),
-	assert(d_quimicBombStatus(OID, activated, TIME, WAVE, L_PARAMS)), !.
+
+	%% Cogemos el estado actual, y si el tiempo es 0 se actualiza a activado
+	d_quimicBombStatus(OID,ready, TIME, WAVE, GAS_TIME, L_PARAMS),
+	TIME=0,!,
+
+	%% Actualizamos el estado activado
+	maplist(user:write, ['Paso a activated', '\n']),
+	retract(d_quimicBombStatus(OID, _,_,_,_,_)),
+	assert(d_quimicBombStatus(OID, activated, TIME, WAVE, GAS_TIME, L_PARAMS)), !.
 
 
-%%Renueva el tiempo cogiendo el estado actual, le resta 1 al tiempo, y lo vuelve a guardar el estado
-quimicBomb(OID):-
-	maplist(user:write, ['Me inicio', '\n']),
-	retract(d_quimicBombStatus(OID,ready, TIME, WAVE, L_PARAMS)),!,
-	NTIME is TIME-1,
+%% Renueva el tiempo cogiendo el estado actual, le resta 1 al tiempo, y lo vuelve a guardar el estado
+quimicBomb(OID):-	
+	
+	%%Verifica que estamos en ready y reduce en -1 su tiempo
+	retract(d_quimicBombStatus(OID,ready, TIME, WAVE, GAS_TIME, L_PARAMS)),!,
+	NEWTIME is TIME-1,
 
-		%%Mensaje de ciclos de explosión		
-		'pl-man':lang_message(quimicBomb, cicles_left_for_explosion, MSGMINE),
-		maplist(user:write, [MSGMINE, NEWTIME, '\n']),
+	%%Mensaje de ciclos de explosión		
+	'pl-man':lang_message(quimicBomb, cicles_left_for_explosion, MSGMINE),
+	maplist(user:write, [MSGMINE, TIME, '\n']),
 
-	assert(d_quimicBombStatus(OID, ready, NTIME, WAVE, L_PARAMS)), !.
+	%Actualizamos el estado del tiempo
+	assert(d_quimicBombStatus(OID, ready, NEWTIME, WAVE, GAS_TIME, L_PARAMS)), !.
+
 
 % Quimic bomb init error
-mine(OID):-
+quimicBomb(OID):-
         'pl-man':lang_message(quimicBomb, quimic_bomb_incorrect_instantiation, MSG),
 	maplist(user:write, [MSG, OID, '\n']).
 
@@ -131,15 +153,15 @@ mine(OID):-
 %%%
 
 %%Gas parameters
-gas(init, OID, TIME, L_PARAMS):-
+gas(init, OID, GAS_TIME, WAVE, L_PARAMS):-
 	integer(OID),
-	integer(TIME), TIME >= 1, 
-	retractall(d_gasStatus(OID, _, _)),
+	integer(GAS_TIME), GAS_TIME >= 1,
+	retractall(d_gasStatus(OID, _, _, _)),
         %%---explosion(add_explosion, OID),
-	assert(d_gasStatus(OID, TIME,_)), !.
+	assert(d_gasStatus(OID, GAS_TIME, WAVE, _)), !.
 
 %%gas init error message
-gas(init, OID, _):-
+gas(init, OID, _, _, _):-
         'pl-man':lang_message(quimicBomb, quimic_bomb_bad_parameters, MSG),
 	maplist(user:write, [MSG, OID, '\n']).
 
@@ -149,11 +171,9 @@ gas(init, OID, _):-
 
 %Gas still on the map,
 gas(OID):-
-	retract(d_gasStatus(OID, TIME, L_PARAMS)), 
-	NEWTIME is TIME-1,
-	assert(d_gasStatus(OID, NEWTIME, L_PARAMS)), 
-        gas(destroy_entities, OID), !.
-
+	retract(d_gasStatus(OID, GAS_TIME, WAVE, L_PARAMS)), 
+	NEWTIME is GAS_TIME-1,
+	assert(d_gasStatus(OID, NEWTIME, WAVE, L_PARAMS)),!. 
 
 
 

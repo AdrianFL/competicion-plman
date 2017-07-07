@@ -9,7 +9,7 @@ map([
 ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#'],
 ['#', '.', '#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', '.', '.', '.', '#'],
-['#', '.', '.', '.', '.', '.', '.', '.', ' ', '.', '.', '.', '.', '.', '.', '.', '#'],
+['#', '.', ' ', '.', '.', '.', '.', '.', ' ', '.', '.', '.', '.', '.', '.', '.', '#'],
 ['#', '.', '.', '.', '#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', '.', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#'],
 ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']]).
@@ -20,10 +20,10 @@ initMap:-
 	addSolidObject('#'),
 	
 	%%PRUEBA DEL OBJETO CREADO
-	createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, inactive, quimicBomb,
+	createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, active, quimicBomb,
 			[name(bomba_quimica), solid(false), static(true), use_rule(norule),
 			description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))]),
-	quimicBomb(init,OID_BQ, 2, 2, [ no_destroy(['.']) ]),
+	quimicBomb(init,OID_BQ, 3, 2, 5, [ no_destroy(['.']) ]),
 
 	createGameEntity(OID_MINE, '+', object, 15, 2, active, mine, 
             [name(mine), solid(false), static(false), use_rule(norule), description('programmable mine')]),
