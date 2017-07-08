@@ -158,7 +158,7 @@ gas(init, OID, GAS_TIME, WAVE, L_PARAMS):-
 	integer(GAS_TIME), GAS_TIME >= 1,
 	retractall(d_gasStatus(OID, _, _, _)),
         %%---explosion(add_explosion, OID),
-	assert(d_gasStatus(OID, GAS_TIME, WAVE, _)), !.
+	assert(d_gasStatus(OID, GAS_TIME, WAVE, L_PARAMS)), !.
 
 %%gas init error message
 gas(init, OID, _, _, _):-

@@ -29,7 +29,7 @@
 %%	
 %%	Prolog-pacman user programmed game.
 %%	
-:- module('pl-man', [ doAction/1, havingObject/0, havingObject/1, see/3, play/2, play/3, play/4, replay/2]).
+:- module('pl-man', [ doAction/1, havingObject/0, havingObject/1, see/3, play/2, play/3, play/4, replay/2, contarApariencias/3]). % Procedimientos que se pueden llamar en el juego
 :- use_module('modules/cheeseEngine').
 :- use_module('modules/cheeseText').
 :- use_module('modules/cheeseTools').
@@ -1367,3 +1367,31 @@ replay(init):-
 	startNewMap(M),
 	forall( c(0, cge(EID, Type, l(X, Y), ap(AP, ATR, FC, BC))), 
 		replay(change(cge(EID, Type, l(X, Y), ap(AP, ATR, FC, BC)))) ).
+		
+		
+		
+%%%%%%%      Extensiones extra de PLMAN @_@      %%%%%%%	
+		
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% contarApariencias(+D, [+LS], -A)
+%    D: Direction where to see 'LS' entities
+%    LS: List of symbols you want to count in direction 'D'
+%		 A: Returns the number of appearances seen
+%
+%    Similar to 'see(list,_,_)' but retrieving the number of 
+%    objects with the symbol 'S' 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+contarApariencias(recursion, [], _, C, C).
+contarApariencias(recursion, [H|T], LS, C, I):-
+	( member(H,LS) -> NewCantidad is C+1
+	        ;  NewCantidad = C
+	),
+	contarApariencias(recursion, T, LS, NewCantidad, I).
+
+contarApariencias(D, LS, A):-
+	see(list,D,Lista),	
+	contarApariencias(recursion, Lista, LS, 0, A).
+	
+	
+	
