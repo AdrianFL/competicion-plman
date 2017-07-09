@@ -13,10 +13,10 @@
 
 -Máscara de gas, permite sobrevivir al gas, es un objeto equipable (X turnos).
 
------Tanque armado: conjunto de enemigos de metal, que se mueven de lado a lado, con un punto débil. Dispara proyectiles que se marcan en el mapa con una X, y luego caen generando una explosión.
--Enemigo normal que se mueve y dispara como el arquero.
+----- Tanque armado: conjunto de enemigos de metal, que se mueven de lado a lado, con un punto débil. Dispara proyectiles que se marcan en el mapa con una X, y luego caen generando una explosión.
+(HECHO)- Enemigo normal que se mueve y dispara como el arquero.
 -Pistola que dispara como el arquero.
------Pistola francotiradora: dispara y atraviesa enemigos
+----- (HECHO) Pistola francotiradora: dispara y atraviesa enemigos
 -Enemigo con francotirador.
 -Enemigo con lanzacohetes.
 
