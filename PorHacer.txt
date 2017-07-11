@@ -9,7 +9,7 @@
 		- Hacer el gas expansivo
 		(HECHO // sin tener en cuenta objetos, solo cocos o vacío)- Que pinte los puntos de manera diferente para que se vean debajo, igual con objetos
 		- Diferentes tipos de gases
-
+		- Reactivación tras X tiempo
 
 -Máscara de gas, permite sobrevivir al gas, es un objeto equipable (X turnos).
 

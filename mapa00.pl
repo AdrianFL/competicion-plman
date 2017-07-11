@@ -25,13 +25,13 @@ initMap:-
 	addSolidObject('#'),
 	
 	%%PRUEBA DEL OBJETO CREADO
-	%createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, active, quimicBomb,
-	%		[name(bomba_quimica), solid(false), static(true), use_rule(norule),
-	%		description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))]),
-	%quimicBomb(init,OID_BQ, 3, 2, 5, [ no_destroy(['.']) ]),
+	createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, active, quimicBomb,
+		[name(bomba_quimica), solid(false), static(true), use_rule(norule),
+			description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))]),
+	quimicBomb(init,OID_BQ, 3, 3, 4, [ no_destroy(['.']) ]).
 	
 	%% PRUEBA FRANCOTIRADOR
-	createGameEntity(OID_FRANCO, 'L', object, 7, 3, inactive, norule,
+	/*createGameEntity(OID_FRANCO, 'L', object, 7, 3, inactive, norule,
 			[name(rifle_francotirador), solid(false), static(false), use_rule(gunSniper),
 			description('Rifle de 3 balas que atraviesa enemigos E'), appearance(attribs(bold, white, default))]), 
 	gunSniper(init, OID_G, 3, ['E'], destroy),
@@ -89,7 +89,7 @@ initMap:-
 	%% Mina normal
 	createGameEntity(OID_MINE, '+', object, 15, 2, active, mine, 
             [name(mine), solid(false), static(false), use_rule(norule), description('programmable mine')]),
-	mine(init, OID_MINE, 5, 1, [ no_destroy(['.']) ]).
+	mine(init, OID_MINE, 5, 1, [ no_destroy(['.']) ]).*/
 	
 	
 norule(_).

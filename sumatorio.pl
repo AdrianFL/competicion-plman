@@ -5,3 +5,13 @@ sumatorio(N,S):-N1 is N-1,
 %prueba(X,N):- sumatorio(N,0).
 algo(Y,X):- X>10, Y = x.
 algo(x,X):- X > 10.
+
+
+
+p:- 
+forall(
+			(member(Dir, [up,down,right,left,up-right,up-left,down-right,down-left])),
+				(
+					write(Dir), nl
+				)
+			).

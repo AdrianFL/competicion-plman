@@ -63,7 +63,6 @@
 
 quimicBomb(init,OID,TIME,WAVE,GAS_TIME,L_PARAMS):-
 	integer(OID),
-	integer(OID),
 	integer(TIME), TIME >= 1, 
 	integer(WAVE), WAVE >= 0,
 	integer(GAS_TIME), GAS_TIME >= 1, 
@@ -103,8 +102,6 @@ quimicBomb(OID):-
 	
 	%% Creación del gas inicial
   'pl-man':createGameEntity(GAS_ID, Format, mortal, X, Y, active, gas, App),
-
-  maplist(user:write, ['Soy activated y echo gases (jeje) hola Ale -> /\\', '\n']), !,
 
 	%%Inicialización del gas inicial
   gas(init, GAS_ID, GAS_TIME, WAVE, L_PARAMS), !,
@@ -156,6 +153,7 @@ quimicBomb(OID):-
 gas(init, OID, GAS_TIME, WAVE, L_PARAMS):-
 	integer(OID),
 	integer(GAS_TIME), GAS_TIME >= 1,
+	is_list(L_PARAMS),
 	retractall(d_gasStatus(OID, _, _, _)),
         %%---explosion(add_explosion, OID),
 	assert(d_gasStatus(OID, GAS_TIME, WAVE, L_PARAMS)), !.
@@ -169,13 +167,89 @@ gas(init, OID, _, _, _):-
 %%% Gas behaviour
 %%%
 
+%Gas dies when its life time is 0
+gas(OID):-
+	d_gasStatus(OID, GAS_TIME, _, _), 
+	GAS_TIME=0,
+	'pl-man':destroyGameEntity(OID),!.
+
 %Gas still on the map,
 gas(OID):-
 	retract(d_gasStatus(OID, GAS_TIME, WAVE, L_PARAMS)), 
+
+	%Updating life-time of gas and expansive ratio
 	NEWTIME is GAS_TIME-1,
-	assert(d_gasStatus(OID, NEWTIME, WAVE, L_PARAMS)),!. 
+	NEW_WAVE is WAVE-1,
+
+	assert(d_gasStatus(OID, NEWTIME, NEW_WAVE, L_PARAMS)),!,
+
+	%Creating children
+	(
+		WAVE>0 -> 
+
+		%for every nearby position, we check if we can create a gas
+
+	
+	forall(
+		(member(Dir, [up,down,right,left,up-right,up-left,down-right,down-left])),
+		(
+				%Dir = right,
+
+				%We see where the object will be placed
+				'pl-man':see(OID,normal,Dir,What),
+		    'pl-man':entityLocation(OID, X, Y, _),
+				newdir(Dir,X,Y,NewX,NewY),
 
 
+				%Checking location
+				/*(
+				'pl-man':entityLocation(OID_NEXT, NewX, NewY, _) 
+					->
+				not('pl-man':solidEntity(OID_NEXT)) 
+				),!,*/
+%maplist(user:write, ["EH que peta la direccion: ", Dir, ' en la pos ',X,' - ',Y, ' ----- ',NewX,' - ',NewY,'\n']),!,
+			%%%%%%%%%%%PROVISIONAL%%%%%%%%%%%%%%%%%%%%%%%%
+				(not(member(What,['#','~','*','˞'])) ->
+	
+
+			
+		  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+				%% Los 3 ifs que determinan el dibujo del gas
+				(What = '.' -> Format = '*' , App = [appearance(attribs(bold, yellow, red))] 
+				; (What = ' '-> Format = '˞' ,  App = [appearance(attribs(bold, white, red))]
+				; Format = '~' ,  App = [appearance(attribs(bold, blue, red))]
+					)
+				), 
+	
+				%% Creating the gas entity
+				'pl-man':createGameEntity(GAS_ID, Format, mortal, NewX, NewY, active, gas, App),
+
+				%Adding +1 on the new_time, so it generates an object with the same life-span
+				NEW_TIME is NEWTIME+1,
+
+				%%Initializing gas
+				gas(init, GAS_ID, NEW_TIME, NEW_WAVE, L_PARAMS), !
+				;
+				true
+				)
+			)
+		)	
+	).
+
+	
+
+
+
+%%Add directions
+newdir(up,X,Y,NewX,NewY):- NewX is X, NewY is Y-1. 
+newdir(up-right,X,Y,NewX,NewY):- NewX is X+1, NewY is Y-1. 
+newdir(up-left,X,Y,NewX,NewY):- NewX is X-1, NewY is Y-1. 
+newdir(down,X,Y,NewX,NewY):- NewX is X, NewY is Y+1. 
+newdir(down-right,X,Y,NewX,NewY):- NewX is X+1, NewY is Y+1. 
+newdir(down-left,X,Y,NewX,NewY):- NewX is X-1, NewY is Y+1. 
+newdir(right,X,Y,NewX,NewY):- NewX is X+1, NewY is Y. 
+newdir(left,X,Y,NewX,NewY):- NewX is X-1, NewY is Y. 
 
 
 
