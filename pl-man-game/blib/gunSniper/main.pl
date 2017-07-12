@@ -42,7 +42,7 @@
 % Example
 %--------------------
 % createGameEntity(OID, '¬', object, 6, 5, inactive, norule, 
-%                 data(pistola, not_solid, not_static, gunSniper, 'Derringer')),
+%                 data(rifle, not_solid, not_static, gunSniper, 'Derringer')),
 % gunSniper(init, OID, 1, ['E'], destroy).
 %
 % Creates a sniper rifle with 1 shot of ammo, which is only capable
@@ -112,7 +112,7 @@ p_checkShotSuccess(EID, DIR, X, Y, AIMLIST):-
   %      'pl-man':lang_message(gunSniper, entity_shot, MSG), Comento estas 2 líneas para no sobrecargar la terminal
 	%maplist(user:write, [MSG, AIM, '\n']),
 	
-	%% AÑADIDO: Seguir destruyendo entidades hasta que no quede ninguna en el punto de mira i hay más
+	%% AÑADIDO: Seguir destruyendo entidades hasta que no quede ninguna en el punto de mira si hay más
 	contarApariencias(DIR, AIMLIST, COUNT),
 	( COUNT > 0 -> p_checkShotSuccess(EID, DIR, X, Y, AIMLIST)
 	           ; !      % Corta para que no salte el error de abajo

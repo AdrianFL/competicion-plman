@@ -9,6 +9,7 @@ load_behaviour(quimicBomb).
 load_behaviour(gunSniper).
 load_behaviour(combiner). % Para enemigo que dispare
 load_behaviour(automaticArcher).
+load_behaviour(automaticTurret).
 map([
 ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#'],
@@ -20,21 +21,21 @@ map([
 ]).
 map_size(17, 7).
 num_dots(70).
-pacman_start(8, 3).
+pacman_start(8, 1).
 initMap:- 
 	addSolidObject('#'),
 	
 	%%PRUEBA DEL OBJETO CREADO
-	createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, active, quimicBomb,
+	/*createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, active, quimicBomb,
 		[name(bomba_quimica), solid(false), static(true), use_rule(norule),
 			description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))]),
-	quimicBomb(init,OID_BQ, 3, 3, 4, [ no_destroy(['.']) ]).
+	quimicBomb(init,OID_BQ, 3, 3, 4, [ no_destroy(['.']) ]),*/
 	
 	%% PRUEBA FRANCOTIRADOR
 	/*createGameEntity(OID_FRANCO, 'L', object, 7, 3, inactive, norule,
 			[name(rifle_francotirador), solid(false), static(false), use_rule(gunSniper),
 			description('Rifle de 3 balas que atraviesa enemigos E'), appearance(attribs(bold, white, default))]), 
-	gunSniper(init, OID_G, 3, ['E'], destroy),
+	gunSniper(init, OID_FRANCO, 3, ['E'], destroy),*/
 	
 	%% Enemigos normales
 	createGameEntity(EID_0, 'E', mortal, 8, 4, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
@@ -61,7 +62,7 @@ initMap:-
 	%% ----------
 	
 	%% Prueba del enemigo que dispara
-	EID_C1_X = 7,
+	/*EID_C1_X = 7,
 	EID_C1_Y = 1,
 	EID_C1_DELAY = 1,
 	EID_C1_MOVEMENT = [n,r,r,n,l,d,d,n],
@@ -90,6 +91,21 @@ initMap:-
 	createGameEntity(OID_MINE, '+', object, 15, 2, active, mine, 
             [name(mine), solid(false), static(false), use_rule(norule), description('programmable mine')]),
 	mine(init, OID_MINE, 5, 1, [ no_destroy(['.']) ]).*/
+	
+	%% Torreta
+	
+	/*createGameEntity(OID_TURRET1, '˧', object, 15, 3, active, automaticTurret,
+			[name(torretaAutomatica1), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, default))]),
+	automaticTurret(init, OID_TURRET1, ['E'], [up,down,left,right], 2, [ bullet_appearance('Ξ', normal, red, default) ]),
+	
+	createGameEntity(OID_TURRET2, '˫', object, 2, 3, active, automaticTurret,
+			[name(torretaAutomatica1), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, default))]),
+	automaticTurret(init, OID_TURRET2, ['E'], [up,down,left,right], 2, [ bullet_appearance('Ξ', normal, red, default) ]),*/
+	
+	createGameEntity(OID_TURRET3, 'Ͱ', object, 8, 3, active, automaticTurret,
+			[name(torretaAutomatica1), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, default))]),
+	automaticTurret(init, OID_TURRET3, ['E'], [up,down,left,right], 2, []).
+	
 	
 	
 norule(_).
