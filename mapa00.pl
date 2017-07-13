@@ -14,14 +14,14 @@ map([
 ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#'],
 ['#', '.', '#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', '.', '.', '.', '#'],
-['#', '.', ' ', '.', '.', '.', '.', '.', ' ', '.', '.', '.', '.', '.', '.', '.', '#'],
+['#', '.', ' ', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#'],
 ['#', '.', '.', '.', '#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', '.', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#'],
 ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']
 ]).
 map_size(17, 7).
 num_dots(70).
-pacman_start(8, 1).
+pacman_start(7, 1).
 initMap:- 
 	addSolidObject('#'),
 	
@@ -32,10 +32,10 @@ initMap:-
 	quimicBomb(init,OID_BQ, 3, 3, 4, [ no_destroy(['.']) ]),*/
 	
 	%% PRUEBA FRANCOTIRADOR
-	/*createGameEntity(OID_FRANCO, 'L', object, 7, 3, inactive, norule,
+	createGameEntity(OID_FRANCO, 'L', object, 8, 1, inactive, norule,
 			[name(rifle_francotirador), solid(false), static(false), use_rule(gunSniper),
 			description('Rifle de 3 balas que atraviesa enemigos E'), appearance(attribs(bold, white, default))]), 
-	gunSniper(init, OID_FRANCO, 3, ['E'], destroy),*/
+	gunSniper(init, OID_FRANCO, 3, ['E'], destroy),
 	
 	%% Enemigos normales
 	createGameEntity(EID_0, 'E', mortal, 8, 4, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
@@ -104,7 +104,7 @@ initMap:-
 	
 	createGameEntity(OID_TURRET3, 'Ͱ', object, 8, 3, active, automaticTurret,
 			[name(torretaAutomatica1), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, default))]),
-	automaticTurret(init, OID_TURRET3, ['E'], [up,down,left,right], 2, []).
+	automaticTurret(init, OID_TURRET3, ['E','@'], [up,down,left,right], 2, []).
 	
 	
 	

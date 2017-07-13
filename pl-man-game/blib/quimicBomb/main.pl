@@ -193,8 +193,6 @@ gas(OID):-
 	forall(
 		(member(Dir, [up,down,right,left,up-right,up-left,down-right,down-left])),
 		(
-				%Dir = right,
-
 				%We see where the object will be placed
 				'pl-man':see(OID,normal,Dir,What),
 		    'pl-man':entityLocation(OID, X, Y, _),
