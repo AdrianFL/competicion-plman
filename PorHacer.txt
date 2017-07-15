@@ -19,6 +19,8 @@
 ----- (HECHO) Pistola francotiradora: dispara y atraviesa enemigos
 -Enemigo con francotirador.
 -Enemigo con lanzacohetes.
+-Generar en un área explosiones cada x intervalo con parámetros para determinar si dura por siempre o temporalmente, y la lista de objetos que protegerán de explosiones (en las que no se generará explosión).
+-Celda semáforo.
 
 //Ideas de mapas
 -Mapa de sigilo y sabotaje, donde tienes que coger varios objetos para armar una bomba, y explotar un objeto. Coger el coco que está protegido por ese objeto para poder ganar.

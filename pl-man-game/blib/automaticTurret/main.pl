@@ -59,7 +59,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- module(automaticTurret, [automaticTurret/1, automaticTurret/6]).
-:- dynamic d_automaticTurretStatus/6, d_MortalEntity/2.
+:- dynamic d_automaticTurretStatus/6, d_MortalEntity/3.
 
 %%%
 %%% Initialization
@@ -94,11 +94,11 @@ correctListMembers([H|T], LIST):-
 %%%
 
 
-% Destroy a mortal entity if it remains in the map
+% Destroy a mortal entity if it remains in the map (only the turret that created it)
 automaticTurret(OID):-
-  d_MortalEntity(EID,COMMAND),  
+  d_MortalEntity(OID,EID,COMMAND),  
   COMMAND = destroy,
-  retractall(d_MortalEntity(_, _)),
+  retractall(d_MortalEntity(_, _, _)),
   'pl-man':destroyGameEntity(EID).
 
 
@@ -108,7 +108,7 @@ automaticTurret(OID):-
 	CYCLESPASSED < MAX_DELAY,
 	NEWCYCLES is CYCLESPASSED + 1,
 	% Cuando la torreta esté lista para disparar, se vuelve verde
-	( NEWCYCLES = MAX_DELAY -> 'pl-man':changeEntityAppearance(OID, _, bold, green, default)
+	( NEWCYCLES = MAX_DELAY -> 'pl-man':changeEntityAppearance(OID, _, bold, green, _)
 	  ; true
 	),
 	retract(d_automaticTurretStatus(OID, L_AIM, DIR, DELAY, L_PARAMS, _)),
@@ -154,8 +154,8 @@ automaticTurret(OID):-
 	  'pl-man':createGameEntity(EID_WHAT, NewApp, mortal, X, Y, active, entitySequentialMovement, [appearance(attribs(OldAtr, OldTC, OldBC))]),
 		'pl-man':entitySequentialMovement(init, EID_WHAT, [n], []),
 		
-		% The entity must be destroyed in next step
-		assert(d_MortalEntity(EID_WHAT, destroy))
+		% The entity must be destroyed in next step (by OID turret)
+		assert(d_MortalEntity(OID, EID_WHAT, destroy))
 	  	 
 	  ;
 
@@ -177,74 +177,15 @@ automaticTurret(OID):-
 		      )
 		  )
 	),
-	'pl-man':changeEntityAppearance(OID, APP, bold, red, default), !. % Change turret appearance as it was overheated
+	'pl-man':changeEntityAppearance(OID, _, _, _, OldBC), % Don't change background color
+	'pl-man':changeEntityAppearance(OID, APP, bold, red, OldBC), !. % Change turret appearance as it was overheated
 
-	/*
-% Check if we have to shot
-automaticTurret(OID):-
-	d_automaticTurretStatus(OID, L_AIM, L_DIR, _, _, _),	
-	member(DIR,L_DIR), % Direction is priority
-	'pl-man':see(OID, list, DIR, SEELIST),
-	member(AIM, L_AIM),
-	member(AIM, SEELIST),
-	
-	retract(d_automaticTurretStatus(OID, L_AIM, L_DIR, DELAY, L_PARAMS, _)),
-	assert(d_automaticTurretStatus(OID, L_AIM, L_DIR, DELAY, L_PARAMS, 0)), % Time to recharge
-		
-	% If shoots plman, game ends (plman dies)
-	( AIM = '@' -> 
-		'pl-man':entityType(PacID, pacman), 
-	  'pl-man':entityLocation(PacID, X, Y, _), % Gets where pacman is
-	  
-	  'pl-man':getDMap(Map),
-	  'pl-man':whatYouSee(OID, Map, X, Y, WHAT,
-	  
-		/*( ('pl-man':whatYouSee(OID, Map, X, Y, WHAT) % Gets all entities where pacman is
-				( not(member(WHAT, ['@'])) ->            % Choose the first entity that is not @
-					true  
-				) 
-			) -> 
-			'pl-man':entityLocation(NEW_EID, X, Y, WHAT), % Gets the EID of the entity
-			'pl-man':changeEntityAppearance(NEW_EID, WHAT, OldAtr, OldTC, OldBC), % Gets entity appearance to create it over plman
-			NewApp = WHAT                
-			
-			;
-			
-			'pl-man':getCellContent(X, Y, Map, NewApp), OldAtr = normal, OldTC = default, OldBC = default
-		),
-	  
-	  % Create a mortal entity under plman, making him die (but he actually died due to the turret)
-	  'pl-man':createGameEntity(EID_WHAT, WHAT, mortal, X, Y, active, entitySequentialMovement, [appearance(attribs(OldAtr, OldTC, OldBC))]),
-		'pl-man':entitySequentialMovement(init, EID_WHAT, [], [])
-	  	 
-	  ;
-
-		nth0(DIST, SEELIST, AIM),
-		'pl-man':entityLocation(OID, X, Y, _), % Obtiene X e Y de la torreta
-		AUX_DIST is DIST+1,
-		p_calculateEntityXY(DIR, AUX_DIST, X, Y, EX, EY),
-		'pl-man':entityLocation(DEST_EID,EX,EY,AIM),
-		'pl-man':destroyGameEntity(DEST_EID), !
-	
-	),
-	
-	% Cambia la apariencia de la torreta para que mire hacia donde dispara. Además, al disparar se sobrecarga (se pone roja)
-	
-	( DIR = up -> APP = '┴'
-	  ; ( DIR = down -> APP = 'T'
-	      ; ( DIR = left -> APP ='˧'
-	          ; APP = '˫'
-	        )
-	    )
-	),
-	'pl-man':changeEntityAppearance(OID, APP, bold, red, default), !. % Change turret appearance as it was overheated
-	*/
 
 % init error
-automaticTurret(EID):-
-	not(d_automaticTurretStatus(EID, _, _, _, _, _)),
+automaticTurret(OID):-
+	not(d_automaticTurretStatus(OID, _, _, _, _, _)),
         'pl-man':lang_message(automaticTurret, incorrect_instantiation, MSG),
-	maplist(user:write, ['(', EID, '): ', MSG, '\n']).
+	maplist(user:write, ['(', OID, '): ', MSG, '\n']).
 	
 
 	
