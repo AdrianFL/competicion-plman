@@ -50,31 +50,40 @@
 :- module(armoredVehicle, [ armoredVehicle/1, armoredVehicle/7 ]).
 :- dynamic d_vehicleMove/3.
 :- dynamic d_components/2.
+:- dynamic d_state/2.
+:- dynamic d_dotPosition/3.
 
 %% Init
 armoredVehicle(init, EID, INIT_MOVE, X, Y, COMPONENTS, LIMITS):-
 	%%Data corroboration
 	number(EID),
+	is_list(COMPONENTS),
 	is_list(LIMITS),
 	
 	%%Dynamic data assert
-	retractall(d_enemyBMStatus(EID, _, _)),
+	retractall(d_vehicleMove(EID, _, _)),
 	assert(d_vehicleMove(EID, INIT_MOVE, LIMITS)),
 
 	retractall(d_components(EID,_)),
-	assert(d_components(EID,COMPONENTS)), 
+	assert(d_components(EID,COMPONENTS)),
+
+	retractall(d_state(EID, _)),
+	assert(d_state(EID,move)),
+
+	retractall(d_dotPosition(EID,_,_)),
+	assert(d_dotPosition(EID,1,1)),
+
   %%Piece creation
-	
 	LocX is X+1,
-	'pl-man':createGameEntity(PIEZA1, 'A', object, LocX, Y, inactive, mine, 
+	'pl-man':createGameEntity(PIEZA1, 'A', mortal, LocX, Y, inactive, norule, 
             [name(pieza1), solid(false), static(false), use_rule(norule), description('Armored vehicle component 1')]),!,
 	
 	LocX2 is X-1,
-	'pl-man':createGameEntity(PIEZA2, 'B', object, LocX2, Y, inactive, mine, 
+	'pl-man':createGameEntity(PIEZA2, 'B', mortal, LocX2, Y, inactive, norule, 
             [name(pieza2), solid(false), static(false), use_rule(norule), description('Armored vehicle component 2')]),!,
 	
 	LocY is Y+1,
-	'pl-man':createGameEntity(PIEZA3, 'C', object, X, LocY, inactive, mine, 
+	'pl-man':createGameEntity(PIEZA3, 'C', mortal, X, LocY, inactive, norule, 
             [name(pieza3), solid(false), static(false), use_rule(norule), description('Armored vehicle component 3')]),!,
 	append([PIEZA1,PIEZA2,PIEZA3],COMPONENTS,LISTA),
 
@@ -87,17 +96,51 @@ armoredVehicle(init, EID, _, _, _, _, _):-
         maplist(user:write, [MSG, EID, '\n']).
 
 %%
+%%% VEHICLE BEHAVIOUR
+%%
+
+%%Conditions to die and win the map
+armoredVehicle(EID):-
+		%The player destroyed some components of the vehicle, so it's not functional anymore		
+		countComponents(EID,Counter),
+
+		%Conditions for it to be destroyed
+		Counter =< 2,
+
+		%ate the dot that the cars holds
+		d_dotPosition(EID,X,Y),
+		'pl-man':entityType(PlmanID,pacman),
+		'pl-man':getDMap(Map),
+		'pl-man':eatDot(PlmanID,Map,X,Y),!,
+
+		%%destroy the components of the armored vehicle, 
+		destroyComponents(EID),
+
+		%erase states
+		retractall(d_components(EID,_)),
+		retractall(d_state(EID,_)),
+		retractall(d_vehicleMove(EID,_,_)),
+		retractall(d_dotPosition(EID,_,_)),
+
+		%destroy object itself
+		'pl-man':destroyGameEntity(EID),!.
+
+
+%%
 %%% VEHICLE MOVEMENT
 %%  
 
 %%Movement to all pieces connected to this object      
 armoredVehicle(EID):-
+	%vehicle can move
+	d_state(EID,move),
+
 	%Take data
 	d_vehicleMove(EID, DIR, LIMITS),
 
 	%Verify an obstacle is not in the way of the vehicle
 	'pl-man':see(EID, list, DIR, X),
-	nth0(2,X,Object),
+	nth0(3,X,Object),
 	not(member(Object, LIMITS)),
 
 	%%Apply to all vehicles pieces the movement
@@ -122,6 +165,34 @@ armoredVehicle(EID):-
 	not(d_vehicleMove(EID, _, _)),
         'pl-man':lang_message(armoredVehicle, instantiation_error, MSG),
 	maplist(user:write, ['(EID: ', EID, '): ', MSG, '\n']).
+
+%%
+%%% EXTRA FUNCTIONS
+%% 
+
+%%Destroy components left
+destroyComponents([]).
+destroyComponents([H|T]):-
+	( 'pl-man':d_entity(H,_,_,_,_) ->  'pl-man':destroyGameEntity(H) 
+	        ;  true
+	), 
+	destroyComponents(T).
+
+destroyComponents(EID):-
+	d_components(EID,List),
+	destroyComponents(List).
+
+%%Counts number of components left
+countComponents(r, [], C, C).
+countComponents(r, [H|T], C, I):-
+	( 'pl-man':d_entity(H,_,_,_,_) -> Counter is C+1
+	        ;  Counter = C
+	), 
+	countComponents(r, T, Counter, I).
+
+countComponents(EID,Number):-
+	d_components(EID,List),
+	countComponents(r, List, 0, Number).
 
 % Next movement direction when the enemy arrives to a limit
 p_enemyNextDir(left, right).
