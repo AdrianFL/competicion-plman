@@ -25,27 +25,31 @@
 %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% enemyBasicMovement
+% armored Vehicle
 %
-% Controlls the behaviour of an enemy (or moving entity) 
-% that moves from left to right or for up to down
+% Controlls the behaviour of an armored vehicle, composed of parts that
+% move Synchronized. This object eats a dot on the position assigned
+% by the player.
 %
 % Initialization
 %--------------------
-%  enemyBasicMovement(init, EID, MOVE_TYPE, LIMITS)
+%  armoredVehicle(init, EID, INIT_MOVE, X, Y, COMPONENTS, LIMITS)
 %   EID: Entity ID of the entity to be controlled
-%   MOVE_TYPE: up-down, down-up, left-right or right-left
-%   LIMITS: List of object that make the entity change
+%   INIT_MOVE: right or left, sets the initial direction of movement
+%   X,Y: Center of the armored vehicle
+%   COMPONENTS: components of the vehicle pre-assigned by the player
+%		LIMITS: entities the vehicle avoids when colliding with them, making it turn to the other side
 %	its moving direction when it sees one of them.
 %
 % Example
 %--------------------
-%  createGameEntity(EID, 'E', mortal, 11, 1, active, enemyBasicMovement, 0),
-%  enemyBasicMovement(init, EID, left-right, ['#', '|']).
+%createGameEntity(OID_VEHICLE, 'X', mortal, 5, 3, active, armoredVehicle,
+%			[name(armoredVehicle), solid(false), static(true), use_rule(norule),
+%			description('Vehiculo armado que dispara granadas a diferentes zonas'), appearance(attribs%%%(normal, red, default))]),
+%	armoredVehicle(init,OID_VEHICLE, right, 5, 3, [], ['#','|']).
 %
-% Creates an enemy that will move from left to right.
-% Whenever it sees a '#' or a '|', it will change its
-% direction of movement.
+% Creates an armored vehicle that starts moving to the right, at 5-3 coordinates,
+% and it turns to the other side when it encounters # or | on its way.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- module(armoredVehicle, [ armoredVehicle/1, armoredVehicle/7 ]).
 :- dynamic d_vehicleMove/3.

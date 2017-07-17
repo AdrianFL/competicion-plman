@@ -23,34 +23,33 @@
 %   You should have received a copy of the GNU General Public License
 %   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% mine
+% Quimic Bomb
 %
-% Implements the behaviour of a programable mine, that 
-% while explode some cycles after it is dropped in
-% some place.
+% Implements the behaviour of a programable Quimic Bomb, that 
+% while liberate the gas some cycles of time, and the gas spreads
+% the area you want it to expand avoinding select objects
 %
 % Includes the sub-behaviours
-%	explosion
+%	gas
 %
 % Initialization
 %--------------------
-%  mine(init, OID, TIME, WAVE, L_PARAMS):-
-%    OID:  Identifier of the mine object
-%    TIME: Cycles before the mine explodes since it is dropped
-%    WAVE: Size (in chars) of the radious of the expansive wave
-%    L_PARAMS: Params to control the way the mine behaves
-%        no_destroy(L_EX): objects or entities that will survive
-%		to the explosion of the mine
+%  quimicBomb(init, OID, TIME, WAVE,GAS_TIME, L_PARAMS):-
+%    OID:  Identifier of the quimic bomb object
+%    TIME: Cycles before the gas is released
+%    WAVE: Size (in chars) of the radious of the expansive wave of the gas
+%		 GAS_TIME: Time the gas exists on its position after being on it
+%    L_PARAMS: for later use
 %
 % Example
 %--------------------
-%   createGameEntity(OID_MINE, '+', object, 5, 2, active, mine, 
+%   createGameEntity(OID_QB, 'Ǒ', object, 5, 2, active, quimicBomb, 
 %	            [name(mine), solid(false), static(false), use_rule(norule), description('programmable mine'))]), 
-%   mine(init, OID_MINE, 2, 1, [ no_destroy(['.']) ]).
+%   quimicBomb(init, OID_MINE, 2, 2, 5 [ no_destroy(['.']) ]).
 %
-% Creates a mine that will explode when two cycles of
-% execution have passed since the mine has been dropped.
-% The explosionAle
+% Creates a quimic bomb that will spread the gas when two cycles of
+% execution have passed, the radius the gas will spread is 2
+% squares in every direction from the quimic bomb, and it will last 5 cycles
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :-module(quimicBomb, [quimicBomb/1, quimicBomb/6, gas/1, gas/5]).
 :-dynamic d_quimicBombStatus/6. %---mineStatus
