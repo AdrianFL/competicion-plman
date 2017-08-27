@@ -73,7 +73,7 @@ automaticTurret(init, OID, L_AIM, L_DIR, DELAY, L_PARAMS):-
 	length(L_DIR,LENGTH), LENGTH > 0,
 	is_list(L_PARAMS),
 	
-	correctListMembers(L_DIR, [up,down,left,right]), %% Checks if the list has correct directions
+	correctListMembers(L_DIR, [up,down,left,right]), %% Checks if the list has valid directions
 	
 	(member(randomFirstShot, L_PARAMS), CYCLESPASSED is random(DELAY)+1 ; CYCLESPASSED is DELAY),
 	retractall(d_automaticTurretStatus(OID, _, _, _, _, _)),
@@ -94,11 +94,11 @@ correctListMembers([H|T], LIST):-
 %%%
 
 
-% Destroy a mortal entity if it remains in the map (only the turret that created it)
+% Destroy a mortal entity if it remains in the map (by the turret that created it)
 automaticTurret(OID):-
   d_MortalEntity(OID,EID,COMMAND),  
   COMMAND = destroy,
-  retractall(d_MortalEntity(_, _, _)),
+  retract(d_MortalEntity(_, _, _)), % Retract ONLY the state of this turret, not all (retractall)
   'pl-man':destroyGameEntity(EID).
 
 
@@ -134,7 +134,7 @@ automaticTurret(OID):-
 	
 	% If shoots plman, game ends (plman dies)
 	( AIM = '@' -> 
-		'pl-man':entityType(PacID, pacman), 
+	  'pl-man':entityType(PacID, pacman), 
 	  'pl-man':entityLocation(PacID, X, Y, _), % Gets where pacman is
 	  
 	  'pl-man':getDMap(Map),
@@ -151,9 +151,9 @@ automaticTurret(OID):-
 		),
 	  
 	  % Create a mortal entity under plman, making him die (but he actually died due to the turret)
-	  'pl-man':createGameEntity(EID_WHAT, NewApp, mortal, X, Y, active, entitySequentialMovement, [appearance(attribs(OldAtr, OldTC, OldBC))]),
+	  'pl-man':createGameEntity(EID_WHAT, '*', mortal, X, Y, active, entitySequentialMovement, [appearance(attribs(OldAtr, OldTC, OldBC))]),
 		'pl-man':entitySequentialMovement(init, EID_WHAT, [n], []),
-		
+	
 		% The entity must be destroyed in next step (by OID turret)
 		assert(d_MortalEntity(OID, EID_WHAT, destroy))
 	  	 
@@ -164,6 +164,13 @@ automaticTurret(OID):-
 		AUX_DIST is DIST+1,
 		p_calculateEntityXY(DIR, AUX_DIST, X, Y, EX, EY),
 		'pl-man':entityLocation(DEST_EID,EX,EY,AIM),
+
+		'pl-man':createGameEntity(EID_EXPLOSION, '*', mortal, EX, EY, active, entitySequentialMovement, [appearance(attribs(normal, red, yellow))]), % Creates an "explosion" where the entity died
+		'pl-man':entitySequentialMovement(init, EID_EXPLOSION, [n], []),
+		
+		% The explosion must be destroyed in next step (by the turret that created it)
+		assert(d_MortalEntity(OID, EID_EXPLOSION, destroy)),
+
 		'pl-man':destroyGameEntity(DEST_EID), !
 	
 	),
