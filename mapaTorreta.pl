@@ -123,7 +123,7 @@ initMap:-
 	
 	createGameEntity(OID_TURRET4, '˧', object, 13, 11, active, automaticTurret,
 			[name(torretaAutomatica4), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, magenta))]),
-	automaticTurret(init, OID_TURRET4, ['E'/*,'@'*/], [up,down,left,right], 2, []).
+	automaticTurret(init, OID_TURRET4, ['E','@'], [up,down,left,right], 2, []).
 	
 	
 norule(_).
