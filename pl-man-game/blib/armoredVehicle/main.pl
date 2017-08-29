@@ -33,49 +33,72 @@
 %
 % Initialization
 %--------------------
-%  armoredVehicle(init, EID, INIT_MOVE, X, Y, COMPONENTS, LIMITS)
+%  armoredVehicle(init, EID, INIT_MOVE, X, Y, X2, Y2, LIMITS, Counter)
 %   EID: Entity ID of the entity to be controlled
 %   INIT_MOVE: right or left, sets the initial direction of movement
 %   X,Y: Center of the armored vehicle
-%   COMPONENTS: components of the vehicle pre-assigned by the player
+%		X2,Y2: position of the winning dot, if negative, then the dot will be considered off the map
+%
 %		LIMITS: entities the vehicle avoids when colliding with them, making it turn to the other side
 %	its moving direction when it sees one of them.
+%   Counter: Number indicating steps the vehicle does before launching an another attack; -1 for no attacks and 0 for no waits
 %
 % Example
 %--------------------
 %createGameEntity(OID_VEHICLE, 'X', mortal, 5, 3, active, armoredVehicle,
 %			[name(armoredVehicle), solid(false), static(true), use_rule(norule),
 %			description('Vehiculo armado que dispara granadas a diferentes zonas'), appearance(attribs%%%(normal, red, default))]),
-%	armoredVehicle(init,OID_VEHICLE, right, 5, 3, [], ['#','|']).
+%	armoredVehicle(init,OID_VEHICLE, right, 5, 3, 1, 1, ['#','|'], 5).
 %
 % Creates an armored vehicle that starts moving to the right, at 5-3 coordinates,
+% eating the dot at 1-1 when destroyed, 
 % and it turns to the other side when it encounters # or | on its way.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- module(armoredVehicle, [ armoredVehicle/1, armoredVehicle/7 ]).
+:- module(armoredVehicle, [ armoredVehicle/1, armoredVehicle/9 ]).
 :- dynamic d_vehicleMove/3.
 :- dynamic d_components/2.
 :- dynamic d_state/2.
-:- dynamic d_dotPosition/3.
+:- dynamic d_dotPosition/4.
+:- dynamic d_attackTime/4.
 
 %% Init
-armoredVehicle(init, EID, INIT_MOVE, X, Y, COMPONENTS, LIMITS):-
+armoredVehicle(init, EID, INIT_MOVE, X, Y, X2, Y2, LIMITS, Counter):-
 	%%Data corroboration
 	number(EID),
-	is_list(COMPONENTS),
+	integer(X),
+	integer(Y),
+	integer(X2),
+	integer(Y2),
+	integer(Counter),
+	-1 =< Counter, 
+	(
+		
+		(X2 < 0 ; Y2 < 0)
+	 
+		-> 
+			
+		(
+			retractall(d_dotPosition(EID,_,_,_)),
+			assert(d_dotPosition(EID,not,0,0))
+		) 
+			;
+		(
+			retractall(d_dotPosition(EID,_,_,_)),
+			assert(d_dotPosition(EID,eat,X2,Y2))
+		)
+	),
+
 	is_list(LIMITS),
 	
 	%%Dynamic data assert
 	retractall(d_vehicleMove(EID, _, _)),
 	assert(d_vehicleMove(EID, INIT_MOVE, LIMITS)),
 
-	retractall(d_components(EID,_)),
-	assert(d_components(EID,COMPONENTS)),
-
 	retractall(d_state(EID, _)),
 	assert(d_state(EID,move)),
 
-	retractall(d_dotPosition(EID,_,_)),
-	assert(d_dotPosition(EID,1,1)),
+	retractall(d_attackTime(EID, _, _)),
+	assert(d_attackTime(EID,Counter,Counter)),
 
   %%Piece creation
 	LocX is X+1,
@@ -89,13 +112,40 @@ armoredVehicle(init, EID, INIT_MOVE, X, Y, COMPONENTS, LIMITS):-
 	LocY is Y+1,
 	'pl-man':createGameEntity(PIEZA3, 'C', mortal, X, LocY, inactive, norule, 
             [name(pieza3), solid(false), static(false), use_rule(norule), description('Armored vehicle component 3')]),!,
-	append([PIEZA1,PIEZA2,PIEZA3],COMPONENTS,LISTA),
+
+	LocX3 is X+2,
+	LocY3 is Y+1,
+	'pl-man':createGameEntity(PIEZA4, '˨', mortal, LocX3, LocY3, inactive, norule, 
+            [name(pieza1), solid(false), static(false), use_rule(norule), description('Armored vehicle component 4')]),!,
+
+	LocX4 is X+2,
+	LocY4 is Y-1,
+	'pl-man':createGameEntity(PIEZA5, '˦', mortal, LocX4, LocY4, inactive, norule, 
+            [name(pieza1), solid(false), static(false), use_rule(norule), description('Armored vehicle component 5')]),!,
+
+	LocX5 is X+1,
+	LocY5 is Y+1,
+	'pl-man':createGameEntity(PIEZA6, 'Ħ', mortal, LocX5, LocY5, inactive, norule, 
+            [name(pieza1), solid(false), static(false), use_rule(norule), description('Armored vehicle component 6')]),!,
+
+	LocX6 is X+1,
+	LocY6 is Y-1,
+	'pl-man':createGameEntity(PIEZA7, 'Ħ', mortal, LocX6, LocY6, inactive, norule, 
+            [name(pieza1), solid(false), static(false), use_rule(norule), description('Armored vehicle component 7')]),!,
+
+	'pl-man':createGameEntity(PIEZACENTRO, '¥', mortal, X, Y, inactive, norule, 
+            [name(pieza3), solid(false), static(false), use_rule(norule), description('Armored vehicle component center')]),!,
+
+	%appending pieces to vehicle's list of compoments
+	append([PIEZA1,PIEZA2,PIEZA3, PIEZA4, PIEZA5, PIEZA6, PIEZA7, PIEZACENTRO],[],LISTA),
 
   retractall(d_components(EID,_)),
 	assert(d_components(EID,LISTA)), !.
 	
+
+% Ғ Ł Ҵ Ԥ Ԩ Ԫ Ц Ш
 %%Vehicle instantiation error
-armoredVehicle(init, EID, _, _, _, _, _):-
+armoredVehicle(init, EID, _, _, _, _, _, _, _):-
         'pl-man':lang_message(armoredVehicle, bad_parameters, MSG),
         maplist(user:write, [MSG, EID, '\n']).
 
@@ -112,10 +162,28 @@ armoredVehicle(EID):-
 		Counter =< 2,
 
 		%ate the dot that the cars holds
-		d_dotPosition(EID,X,Y),
-		'pl-man':entityType(PlmanID,pacman),
-		'pl-man':getDMap(Map),
-		'pl-man':eatDot(PlmanID,Map,X,Y),!,
+		(
+			d_dotPosition(EID,eat,X,Y)
+			->
+			(
+				'pl-man':entityType(PlmanID,pacman),
+				'pl-man':getDMap(Map),
+				'pl-man':eatDot(PlmanID,Map,X,Y), !
+			)
+			;
+			(
+				%Or just it a dot, which must be added on map's dots counter
+				d_dotPosition(EID,not,X,Y)
+				->
+				(
+					'pl-man':dotEaten
+				)
+				;
+				(
+					false
+				)
+			)
+		),
 
 		%%destroy the components of the armored vehicle, 
 		destroyComponents(EID),
@@ -134,10 +202,21 @@ armoredVehicle(EID):-
 %%% VEHICLE MOVEMENT
 %%  
 
+%%If it is on attack, then launch missil in order   
+armoredVehicle(EID):-
+	%vehicle on attack mode
+	d_state(EID,attack),!,
+
+	false
+
+	,!.
+
 %%Movement to all pieces connected to this object      
 armoredVehicle(EID):-
+	%Check attack period, and if it's not attack time reduce 1 in counter
+
 	%vehicle can move
-	d_state(EID,move),
+	d_state(EID,move),!,
 
 	%Take data
 	d_vehicleMove(EID, DIR, LIMITS),

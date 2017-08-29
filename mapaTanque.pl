@@ -35,7 +35,7 @@ initMap:-
 	createGameEntity(OID_VEHICLE, 'X', mortal, 5, 3, active, armoredVehicle,
 			[name(armoredVehicle), solid(false), static(true), use_rule(norule),
 			description('Vehiculo armado que dispara granadas a diferentes zonas'), appearance(attribs(normal, red, default))]),
-	armoredVehicle(init,OID_VEHICLE, right, 5, 3, [], ['#','|']).
+	armoredVehicle(init,OID_VEHICLE, right, 5, 3, 1, 1, ['#','|'], 5).
 	
 	
 norule(_).
