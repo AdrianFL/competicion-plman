@@ -71,24 +71,28 @@ gunSniper(OID, _, _, _, _):-
         'pl-man':lang_message(gunSniper, out_of_ammo, MSG),
         maplist(user:write, [MSG, '\n']),
         !.
-% Mientras haya balas
+% Mientras queden balas
 gunSniper(OID, EID, X, Y, DIR):-
 	d_basicSniperStatus(OID, AMMO, AIMLIST, GUN_END),
-				'pl-man':randomBetween(1, 4, BANG_MESSAGE),  % Chorrada para cambiar el mensaje al disparar
+	'pl-man':randomBetween(1, 4, BANG_MESSAGE),  % Chorrada para cambiar el mensaje al disparar
         'pl-man':lang_message(gunSniper, BANG_MESSAGE, MSG), % Totalmente impredecible
         user:writeln(MSG),
-  contarApariencias(DIR, AIMLIST, COUNT), %% Chorrada que viene a continuación
+
+  	contarApariencias(DIR, AIMLIST, COUNT), %% Chorrada que viene a continuación
 	p_checkShotSuccess(EID, DIR, X, Y, AIMLIST),
 	
 	%% Elegir mensaje dependiendo de la calidad del francotirador para darle ánimos
 	( COUNT = 2 -> maplist(user:write, ['¡Impresionante, has destruido ', COUNT, ' enemigos con 1 bala!', '\n'])
 	; ( COUNT = 3 -> maplist(user:write, ['¡Buen tiro! Has destruido ', COUNT, ' enemigos empleando 1 sola bala!', '\n'])
-	  ; maplist(user:write, ['Eres un tirador de élite, ', COUNT, ' bajas', '\n'])
+	  ; ( COUNT > 3 -> maplist(user:write, ['Eres un tirador de élite, ', COUNT, ' bajas', '\n'])
+	    ; true
+	    )
 	  )
 	),
 	
 	p_checkSniperStatus(OID, AMMO, GUN_END),	
         !.
+
 gunSniper(OID, _, _, _, _):-
 	not(d_basicSniperStatus(OID, _, _, _)),
         'pl-man':lang_message(gunSniper, incorrect_instantiation, MSG),
@@ -109,7 +113,7 @@ p_checkShotSuccess(EID, DIR, X, Y, AIMLIST):-
 	p_calculateEntityXY(DIR, DIST, X, Y, EX, EY), % Obtiene las coordenadas de la entidad (EX y EY)
 	'pl-man':entityLocation(DEST_EID,EX,EY,AIM), % Obtiene la EID del objeto a destruir
 	'pl-man':destroyGameEntity(DEST_EID), 
-  %      'pl-man':lang_message(gunSniper, entity_shot, MSG), Comento estas 2 líneas para no sobrecargar la terminal
+        %'pl-man':lang_message(gunSniper, entity_shot, MSG), Comento estas 2 líneas para no sobrecargar la terminal
 	%maplist(user:write, [MSG, AIM, '\n']),
 	
 	%% AÑADIDO: Seguir destruyendo entidades hasta que no quede ninguna en el punto de mira si hay más
