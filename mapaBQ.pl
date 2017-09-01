@@ -24,16 +24,16 @@ pacman_start(8, 3).
 initMap:- 
 	addSolidObject('#'),
 
-	% Mascara de gas
+	% Máscara de gas
 	createGameEntity(OID_MG, 'G', object, 9, 3, inactive, norule,
-			[name(mascara gas), solid(false), static(false), use_rule(norule),
-			description('Máscara antigás, permite sobrevivir el gas'), appearance(attribs(bold, white, default))]), 
+			[name(mascara_gas), solid(false), static(false), use_rule(norule),
+			description('Máscara antigás, permite sobrevivir al gas'), appearance(attribs(bold, white, default))]), 
 	
 	%%PRUEBA DEL OBJETO CREADO
 	createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, active, quimicBomb,
 		[name(bomba_quimica), solid(false), static(true), use_rule(norule),
 			description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))]),
-	quimicBomb(init,OID_BQ, 3, 3, 4, [ no_destroy(['.']) ]).
+	quimicBomb(init,OID_BQ, 1, 4, 15, [ no_destroy(['.']) ]). % Cambiad el 15 por 14 para vez el caso especial
 
 norule(_).
 norule(_,_,_,_,_).

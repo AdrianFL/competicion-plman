@@ -78,7 +78,7 @@ quimicBomb(init, OID, _, _, _, _):-
 %%% quimic bomb behaviour
 %%%
 
-%%Si la bomba está acabada, no debe de hacer nada.
+%% Si la bomba está acabada, no debe de hacer nada.
 quimicBomb(OID):-
 	d_quimicBombStatus(OID, finished, _, _, _, _).
 
@@ -100,7 +100,7 @@ quimicBomb(OID):-
 	; Format = '~' ,  App = [appearance(attribs(bold, blue, red))])), 
 	
 	%% Creación del gas inicial
-  'pl-man':createGameEntity(GAS_ID, Format, mortal, X, Y, active, gas, App),
+  'pl-man':createGameEntity(GAS_ID, Format, object, X, Y, active, gas, App), %% MÁSCARA GAS (object por mortal)
 
 	%%Inicialización del gas inicial
   gas(init, GAS_ID, GAS_TIME, WAVE, L_PARAMS), !,
@@ -174,6 +174,37 @@ gas(OID):-
 
 %Gas still on the map,
 gas(OID):-
+	%
+
+	% Añadido para la máscara de gas
+	'pl-man':entityType(PACMANID, pacman),
+	'pl-man':entityLocation(OID, X, Y, _),
+	( 'pl-man':entityLocation(PACMANID, X, Y, _) ->
+	  ( not('pl-man':havingObject(PACMANID, name(mascara_gas))) ->
+     	% maplist(user:write, ['PLMAN Ha olido gas en (', X, ',', Y, '), sufrirá una muerte lenta y dolorosa \n']),		
+		'pl-man':playerStats(set(game_status(finished)))
+		; 
+ 	  	true
+	  )
+	  ;
+	  true 
+	),
+
+	%% Los 3 ifs que determinan el dibujo del gas (actualización)
+		'pl-man':entityLocation(OID, _, _, Ap),
+		'pl-man':see(OID,normal,here, WHAT),
+		(WHAT = '.' -> CHARACTER = '*', NewAtr = bold, NewTC = yellow, NewBC = red 
+		; 
+		  (WHAT = ' ' -> CHARACTER = '˞', NewAtr = bold, NewTC = white, NewBC = red
+		  ; 
+			(WHAT = '@' -> CHARACTER = '·', NewAtr = bold, NewTC = white, NewBC = red
+		      ; CHARACTER = '~', NewAtr = bold, NewTC = magenta, NewBC = red
+		    )
+		  )
+		),
+		'pl-man':changeEntityAppearance(OID, CHARACTER, NewAtr, NewTC, NewBC),
+
+	%
 	retract(d_gasStatus(OID, GAS_TIME, WAVE, L_PARAMS)), 
 
 	%Updating life-time of gas and expansive ratio
@@ -205,22 +236,27 @@ gas(OID):-
 				not('pl-man':solidEntity(OID_NEXT)) 
 				),!,*/
 %maplist(user:write, ["EH que peta la direccion: ", Dir, ' en la pos ',X,' - ',Y, ' ----- ',NewX,' - ',NewY,'\n']),!,
+
 			%%%%%%%%%%%PROVISIONAL%%%%%%%%%%%%%%%%%%%%%%%%
-				(not(member(What,['#','~','*','˞'])) ->
+				(not(member(What,['#','~','*','˞','·'])) ->
 	
 
 			
 		  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-				%% Los 3 ifs que determinan el dibujo del gas
+				%% Los 4 ifs que determinan el dibujo del gas
 				(What = '.' -> Format = '*' , App = [appearance(attribs(bold, yellow, red))] 
-				; (What = ' '-> Format = '˞' ,  App = [appearance(attribs(bold, white, red))]
-				; Format = '~' ,  App = [appearance(attribs(bold, blue, red))]
-					)
+				; 
+				  (What = ' '-> Format = '˞' ,  App = [appearance(attribs(bold, white, red))]
+				  ; 
+					(What = '@' -> Format = '·', App = [appearance(attribs(bold,white,red))]
+		      		  ; Format = '~' ,  App = [appearance(attribs(bold, magenta, red))]
+		    		)
+				  )
 				), 
 	
 				%% Creating the gas entity
-				'pl-man':createGameEntity(GAS_ID, Format, mortal, NewX, NewY, active, gas, App),
+				'pl-man':createGameEntity(GAS_ID, Format, object, NewX, NewY, active, gas, App), %% CAMBIO MÁSCARA (object por mortal)
 
 				%Adding +1 on the new_time, so it generates an object with the same life-span
 				NEW_TIME is NEWTIME+1,
@@ -233,6 +269,7 @@ gas(OID):-
 			)
 		)	
 	).
+	  	
 
 	
 
