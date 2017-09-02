@@ -25,78 +25,72 @@
 %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% pushBlocks
+% lightTrafficBlock
 %
-% Controlls the behaviour of a list of blocks that 
-% can be pushed using a "Palanca" :)
+% Controls the behaviour of a block
+% that allows pl-man to walk through it
+% at a concrete state
 %
 % Initialization
-%--------------------
-%  pushBlocks(init, OID, BLOCKLIST)
-%   OID: Identifier of the object to use for pushing blocks
-%   BLOCKLIST: List of OIDs of block objects that can
-%		be pushed.
-%
-% Example
-%--------------------
-%  createGameEntity(OID_P, '\\', object, 5, 6, inactive, norule, 
-%                 data(palanca, not_solid, not_static, pushBlocks, 'Barra grande con la
-%			que se pueden empujar grandes bloques.')), 
-%  createGameEntity(OID_B1,'%', object, 18, 5, inactive, norule, 
-%                 data(bloque1, solid, static, norule, 'Bloque grande de hormigón')), 
-%  createGameEntity(OID_B2,'%', object, 18, 6, inactive, norule, 
-%                 data(bloque2, solid, static, norule, 'Bloque grande de hormigón')),
-%  pushBlocks(init, OID_P, [OID_B1, OID_B2]).
-%
-% Creates 2 blocks (OID_B1 & OID_B2) that can be pushed
-% using the "Palanca" (OID_P)
+% ------------------
+% lightTrafficBlock(init, OID, STATE, REDTIME, GREENTIME, X, Y):-
+% OID: Identifier of the object
+% STATE: Defines the initial state of the block. 0 for red state, and 1 for green state
+% REDTIME and GREENTIME: Defines the time in turns that every state lasts
+% X and Y: Defines the X and Y coordinates of the block
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- module(pushBlocks, [ pushBlocks/3, pushBlocks/5] ).
-:- dynamic d_availablePushBlocks/2.
+:-module(lightTrafficBlock, [lightTrafficBlock/7, lightTrafficBlock/1]).
+:-dynamic d_lightTrafficStatus/5.
+:-dynamic d_lightTime/2. %One for every state
 
-pushBlocks(init, OID, BLOCKLIST):-
-	is_list(BLOCKLIST),
-	retractall(d_availablePushBlocks(_,_)),
-	assert(d_availablePushBlocks(OID, BLOCKLIST)).
-pushBlocks(OID, _, X, Y, DIR):-
-	p_moveCollindantEntities(OID, X, Y, DIR),
-        'pl-man':lang_message(pushBlocks, pushing, MSG),
-        'pl-man':lang_message(DIR, DIRMSG),
-	maplist(user:write, [MSG, DIRMSG, '\n']), !.
-pushBlocks(OID, _, _, _, _):-
-	not(d_availablePushBlocks(OID, _)),
-        'pl-man':lang_message(pushBlocks, bad_parameters, MSG),
-	maplist(user:write, [MSG, OID, '\n']), !.
-pushBlocks(OID, _, _, _, _):-
-	'pl-man':objectName(OID, OName),
-        'pl-man':lang_message(pushBlocks, cannot_use, MSG),
-	maplist(user:write, [MSG, OName, '!\n']).
+lightTrafficBlock(init, OID, STATE,REDTIME,GREENTIME, X, Y):-
+	integer(OID),
+	integer(STATE),
+	integer(GREENTIME),
+	integer(REDTIME),
+	retractall(d_lightTime(_,_)),
+	assert(d_lightTime(REDTIME, GREENTIME)),
+	(STATE=:=0->TIME is REDTIME; STATE=:=1 -> TIME is GREENTIME; TIME is 0),
+	retractall(d_lightTrafficStatus(OID, _, _, _, _)),
+	assert(d_lightTrafficStatus(OID, STATE, TIME, X, Y)).
 
-%
-%  Subrules
-% 
-p_dir(   up,  0, -1).
-p_dir( down,  0,  1).
-p_dir( left, -1,  0).
-p_dir(right,  1,  0).
-p_moveCollindantEntities(OID, X, Y, DIR):-
-	'pl-man':entityLocation(OID_PUSH, X, Y, _),
-	d_availablePushBlocks(OID, BLOCKLIST),
-	member(OID_PUSH, BLOCKLIST),
-	'pl-man':getDMap(M),
-	p_dir(DIR, ADDX, ADDY),
-	X1 is X+ADDX, Y1 is Y+ADDY,
-	p_moveCollindantEntities(X1, Y1, DIR, M, BLOCKLIST),
-	'pl-man':doEntityAction(OID_PUSH, M, move(DIR)), !.
-p_moveCollindantEntities(_, _, _, _).
-p_moveCollindantEntities(0, _, _, _, _):-!.
-p_moveCollindantEntities(_, 0, _, _, _):-!.
-p_moveCollindantEntities(X, Y, _, _, _):-
-	not('pl-man':entityLocation(_, X, Y, _)), !.
-p_moveCollindantEntities(X, Y, DIR, M, BL):-
-	p_dir(DIR, ADDX, ADDY),
-	X1 is X+ADDX, Y1 is Y+ADDY,
-	p_moveCollindantEntities(X1, Y1, DIR, M, BL),
-	forall('pl-man':entityLocation(EID, X, Y, _), (
-		not(member(EID, BL)),
-		'pl-man':doEntityAction(EID, M, move(DIR)))), !.
+
+%Initialization error message
+lightTrafficBlock(init, OID, _, _, _, _, _):-
+	'pl-man':lang_message(lightTrafficBlock, lightTrafficBlock_bad_parameters, MSG),
+	maplist(user:write, [MSG, OID, '\n']).
+
+
+%%%
+%%% lightTrafficBlock behaviour
+%%%
+
+
+lightTrafficBlock(OID):-
+	d_lightTrafficStatus(OID, STATE, TIME, X, Y),
+	d_lightTime(REDTIME, GREENTIME),
+	TIME=:=0,
+	'pl-man':destroyGameEntity(OID),
+	(STATE=:=0 -> NEWSTATE is 1, 
+	'pl-man':createGameEntity(OID_LTB, '|', object, X, Y, active, lightTrafficBlock,
+			[name(bomba_quimica), solid(false), static(true), use_rule(norule),
+			description('Bomba química que infecta una sala'), appearance(attribs(normal, green, default))])
+	
+	; NEWSTATE is 0, 
+	'pl-man':createGameEntity(OID_LTB, '=', object, X, Y, active, lightTrafficBlock,
+			[name(bomba_quimica), solid(true), static(true), use_rule(norule),
+			description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))])), 
+
+	lightTrafficBlock(init, OID_LTB, NEWSTATE, REDTIME, GREENTIME, X, Y).
+
+
+lightTrafficBlock(OID):-
+	retract(d_lightTrafficStatus(OID, STATE, TIME, X, Y)), 
+	NEWTIME is TIME-1,
+	assert(d_lightTrafficStatus(OID, STATE, NEWTIME, X, Y)).
+
+
+
+
+
+

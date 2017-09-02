@@ -27,6 +27,4 @@
 %%
 %% Warning messages
 %%
-lang_message(pushBlocks, bad_parameters, 'ERROR: Parametros erroneos para pushBlocks/3 inicializando el objeto con OID: ').
-lang_message(pushBlocks, pushing,'Empujando bloque hacia ').
-lang_message(pushBlocks, cannot_use,'Ahi no puedo usar ').
+lang_message(lightTrafficBlock, lightTrafficBlock_bad_parameters, 'ERROR: Parametros erroneos para lightTrafficBlock/3 inicializando el objeto con OID: ').

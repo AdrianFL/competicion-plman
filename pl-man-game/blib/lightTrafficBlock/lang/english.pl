@@ -27,6 +27,5 @@
 %%
 %% Warning messages
 %%
-lang_message(pushBlocks, bad_parameters, 'ERROR: Incorrect parameters initilizing pushBlocks/3 for object with OID: ').
-lang_message(pushBlocks, pushing,'Pushing block towards ').
-lang_message(pushBlocks, cannot_use,'Cannot be used there: ').
+lang_message(lightTrafficBlock, lightTrafficBlock_bad_parameters, 'ERROR: Incorrect parameters initilizing lightTrafficBlock/3 for object with OID: ').
+
