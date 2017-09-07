@@ -222,9 +222,21 @@ armoredVehicle(EID):-
 	d_vehicleMove(EID, DIR, LIMITS),
 
 	%Verify an obstacle is not in the way of the vehicle
-	'pl-man':see(EID, list, DIR, X),
-	nth0(3,X,Object),
-	not(member(Object, LIMITS)),
+	%'pl-man':see(EID, list, DIR, X),
+	%nth0(3,X,Object),
+	%not(member(Object, LIMITS)),
+	
+	forall(
+		(
+			d_components(EID, LISTA),member(PIEZA,LISTA)	
+		)
+		,
+		(
+			'pl-man':see(PIEZA,list,DIR,X),
+			nth0(1,X,Object),
+			not(member(Object,LIMITS))
+		)
+	),!,
 
 	%%Apply to all vehicles pieces the movement
   'pl-man':doAction(EID, move(DIR)),

@@ -15,16 +15,25 @@
 
 ----- Tanque armado: conjunto de enemigos de metal, que se mueven de lado a lado, con un punto débil. Dispara proyectiles que se marcan en el mapa con una X, y luego caen generando una explosión.
 (HECHO)- Enemigo normal que se mueve y dispara como el arquero.
--Pistola que dispara como el arquero.
------ (HECHO) Pistola francotiradora: dispara y atraviesa enemigos
--Enemigo con francotirador.
--Enemigo con lanzacohetes.
--Generar en un área explosiones cada x intervalo con parámetros para determinar si dura por siempre o temporalmente, y la lista de objetos que protegerán de explosiones (en las que no se generará explosión).
--Celda semáforo.
+
+------------ (COMPLICADO, para mapa de escape) Pistola que dispara como el arquero.
+
+(HECHO)-Pistola francotiradora: dispara y atraviesa enemigos
+
+------------ (TANQUE) Enemigo con lanzacohetes.
+
+- Bombardeo aéreo
+	->Pasos:
+		
+		-Generar en un área explosiones cada x intervalo con parámetros para determinar si dura por siempre o temporalmente, y la lista de objetos que protegerán de explosiones (en las que no se generará explosión).
+
+(HECHO)-Celda semáforo.
+
 
 //Ideas de mapas
 -Mapa de sigilo y sabotaje, donde tienes que coger varios objetos para armar una bomba, y explotar un objeto. Coger el coco que está protegido por ese objeto para poder ganar.
 -Mapa de fuego de artillería, enemigos disparando disparando del frente.
 -Mapa de boss final con el tanque armado.
 -Mapa donde hay trincheras, y cada X turnos caen bombas. Te matan si no estás en la trinchera.
+,Mapa de compañero.
 

@@ -16,7 +16,7 @@ map([
 ]).
 map_size(17, 7).
 num_dots(1).
-pacman_start(8, 2).
+pacman_start(8, 1).
 initMap:- 
 	addSolidObject('#'),
 	
