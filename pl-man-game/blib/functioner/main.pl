@@ -67,7 +67,7 @@ functioner(init, F_OID, FUNCTION_LIST, COUNTER, REPEAT):-
 	retractall(d_Counter(F_OID, _, _, _)),
 	assert(d_Counter(F_OID,COUNTER,REPEAT,CURRENT)).
 
-functioner(init,F_OID,_):-
+functioner(init,F_OID,_, _, _):-
 	 'pl-man':lang_message(functioner, bad_parameters, MSG),
    maplist(user:write, [MSG, F_OID, '\n']).
 
