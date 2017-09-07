@@ -66,47 +66,12 @@ safeStand:- not(s(up,'E')), not(s(up,'F')), not(s(right,'E')), not(s(right,'F'))
 
 % REGLAS
 
-reg:- not(havingObject(appearance('L'))), s(left,'L'), g(left), obtenerArma(5), ce(areaIzquierda).
+reg:- m(none).
+reg:- not(havingObject(appearance('€'))), s(up,'€'), g(up).
 reg:- not(havingObject(appearance('L'))), not(s(left,'L')), m(left).
 
 ai:- member(DIR,[down,left,up,right]), avistar(DIR,'F'), havingObject(appearance('L')), u(DIR), actualizarBalas.
 ai:- member(DIR,[down,left,up,right]), safeMove(DIR,'.'), m(DIR).
-ai:- todo('#','#','#','.',' ',' ',' ',' '), havingObject(appearance('L')), m(down).
-ai:- todo(' ','#','.',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(right).
-ai:- todo('#','.','#',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(down).
-ai:- todo(' ',' ','#','#','#',' ',' ',' '), havingObject(appearance('L')), m(up).
-ai:- todo(' ',' ',' ','#',' ',' ',' ',' '), havingObject(appearance('L')), m(up).
-ai:- todo(' ',' ',' ',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(left).
-ai:- todo(' ',' ',' ',' ',' ','#','#','#'), havingObject(appearance('L')), avistar(right,'E'), u(right), actualizarBalas.
-ai:- s(left,'#'), s(left-up,'#'), s(left-down,'#'), not(s(up,'#')), safeMove(up,' '), m(up).
-ai:- s(up,'#'), s(left-up,'#'), s(left,'#'), safeMove(right), m(right), ce(areaCentral).
-
-% No quedarse atrapado en un rincón con F persiguiéndome, intentar escapar
-ac:- s(right-down,'#'), s(right-up,'#'), see(list,left,L), nth0(1,L,'F'), see(list,right,R), nth0(1,R,'#'), safeMove(down), m(down).
-ac:- s(right-down,'#'), s(right-up,'#'), see(list,left,L), nth0(1,L,'F'), see(list,right,R), nth0(1,R,'#'), not(safeMove(down)), safeStand, m(none).
-% --
-
-% Salir del rincón (arriba)
-ac:- todo('#','#','#',' ','#','.',' ','#'), safeMove(left), m(left).
-% (abajo)
-ac:- s(up,'#'), s(right-up, ' '), s(right,'#'),s(right-down,'#'), s(down,'#'), s(left-down,'#'),s(left,' '), safeMove(left), m(left).
-% --
-ac:- safeMove(right,'.'), m(right).
-ac:- safeMove(left,'.'), m(left).
-ac:- safeMove(down,'.'), m(down).
-ac:- safeMove(up,'.'), m(up).
-
-
-/*
-reg:- havingObject, see(list,left,L), nth0(1,L,'E'), doAction(use(left)).
-reg:- havingObject, not(see(normal,up,'#')), doAction(move(up)).
-reg:- havingObject, see(normal,up,'#'), not(see(normal,right,'#')), doAction(move(right)).
-reg:- havingObject, see(normal,left,'E'), doAction(use(left)).
-reg:- see(normal,right,'L'), doAction(get(right)).
-reg:- not(see(normal,right,'L')), not(see(normal,right,'#')), doAction(move(right)).
-reg:- doAction(move(none)).
-*/
-
 
 
 rej:- estado(esperarAlineamiento), ea.

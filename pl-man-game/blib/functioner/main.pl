@@ -25,18 +25,19 @@
 %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% basicDoorKey
+% functioner
 %
-% Controlls the behaviour of a door and the group of
-% keys that available to open it.
+% Controlls the behaviour of a non-interactive entity that calls functors
+% after a delay
 %
 % Initialization
 %--------------------
-%  basicDoorKey(init, OID, ON_OPEN, KEYLIST)
-%   OID: Identifier of the door object
-%   ON_OPEN: List of actions to do when door is open. They 
+%  functioner(init, F_OID, FUNCTION_LIST, COUNTER, REPEAT)
+%   F_OID: Identifier of the door object
+%   FUNCTION_LIST: List of functors to do when COUNTER is 0. They 
 %		could be any pl-man actions
-%   KEYLIST: List of OIDs of keys that can open the door
+%   COUNTER: Number of steps to wait until calling the functors
+%   REPEAT: Number of times to recall FUNCTION_LIST
 %
 % Example
 %--------------------
@@ -51,51 +52,57 @@
 % The door and the key simply vanish when the door is opened.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- module('functioner', [ functioner/5, functioner/1 ] ).
+:- module(functioner, [ functioner/5, functioner/1 ] ).
 :- dynamic d_Functions/2.
 :- dynamic d_Counter/4.
+
+%%%
+%%% Initialization
+%%%
 
 functioner(init, F_OID, FUNCTION_LIST, COUNTER, REPEAT):-
 	number(F_OID),
 	is_list(FUNCTION_LIST),
+	number(COUNTER), COUNTER >= 0,
+	number(REPEAT),
 	maplist(callable, FUNCTION_LIST),
 
 	retractall(d_Functions(F_OID, _)),
 	assert(d_Functions(F_OID,FUNCTION_LIST)),
 
-	CURRENT = COUNTER, 
-	retractall(d_Counter(F_OID, _, _, _)),
+	CURRENT = COUNTER,
+	retractall(d_Counter(F_OID, _, _, _)), 
 	assert(d_Counter(F_OID,COUNTER,REPEAT,CURRENT)).
 
 functioner(init,F_OID,_, _, _):-
-	 'pl-man':lang_message(functioner, bad_parameters, MSG),
-   maplist(user:write, [MSG, F_OID, '\n']).
+	'pl-man':lang_message(functioner, bad_parameters, MSG),
+	maplist(user:write, [MSG, F_OID, '\n']).
+
+
+%%%
+%%% Control
+%%%
 
 functioner(F_OID):-
-		d_Counter(F_OID, COUNTER, REPEAT, CURRENT),
-		CURRENT > 0,!,
+	d_Counter(F_OID, COUNTER, REPEAT, CURRENT),
+	CURRENT > 0,
 	
-		NCURRENT is CURRENT-1,
-	
-		retract(d_Counter(F_OID, _, _, _)),
-		assert(d_Counter(F_OID, COUNTER, REPEAT, NCURRENT)).
-		
+	NCURRENT is CURRENT-1,
+	retract(d_Counter(F_OID, _, _, _)),
+	assert(d_Counter(F_OID, COUNTER, REPEAT, NCURRENT)).		
 
 functioner(F_OID):-
 	d_Functions(F_OID, F_LIST),
-	maplist(call, F_LIST),!,
+	maplist(call, F_LIST),
 
 	(
-		d_Counter(F_OID,COUNTER,REPEAT,_), REPEAT =/= 0
-	)
-	->
-	(
+		(d_Counter(F_OID,COUNTER,REPEAT,_), REPEAT =\= 0)
+		->
 		NREPEAT is REPEAT-1,
 		NCURRENT = COUNTER,
 		retract(d_Counter(F_OID, _, _, _)),
 		assert(d_Counter(F_OID, COUNTER, NREPEAT, NCURRENT))
-	)
-	;
-	(
+		;
 		'pl-man':destroyGameEntity(F_OID)
 	).
+

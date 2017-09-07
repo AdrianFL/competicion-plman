@@ -27,4 +27,4 @@
 %%
 %% Warning messages
 %%
-lang_message(functioner, bad_parameters, 'ERROR: Parametros incorrectos en la inicializacion de functioner/3 para la entidad con EID: ').
+lang_message(functioner, bad_parameters, 'ERROR: Parámetros incorrectos en la inicialización de functioner/5 para la entidad con EID: ').

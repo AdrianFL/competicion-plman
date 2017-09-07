@@ -114,13 +114,6 @@ automaticTurret(OID):-
 	retract(d_automaticTurretStatus(OID, L_AIM, DIR, DELAY, L_PARAMS, _)),
 	assert(d_automaticTurretStatus(OID, L_AIM, DIR, DELAY, L_PARAMS, NEWCYCLES)), !.	
 
-% Calculate X,Y location of the entity we are seeing
-p_calculateEntityXY(left, DIST, X, Y, NX, Y):- NX is X-DIST.
-p_calculateEntityXY(right, DIST, X, Y, NX, Y):- NX is X+DIST.
-p_calculateEntityXY(up, DIST, X, Y, X, NY):- NY is Y-DIST.
-p_calculateEntityXY(down, DIST, X, Y, X, NY):- NY is Y+DIST.
-
-
 % Check if we have to shot
 automaticTurret(OID):-
 	d_automaticTurretStatus(OID, L_AIM, L_DIR, _, _, _),	
@@ -151,7 +144,7 @@ automaticTurret(OID):-
 		),
 	  
 	  % Create a mortal entity under plman, making him die (but he actually died due to the turret)
-	  'pl-man':createGameEntity(EID_WHAT, '*', mortal, X, Y, active, entitySequentialMovement, [appearance(attribs(OldAtr, OldTC, OldBC))]),
+	  'pl-man':createGameEntity(EID_WHAT, NewApp, mortal, X, Y, active, entitySequentialMovement, [appearance(attribs(OldAtr, OldTC, OldBC))]),
 		'pl-man':entitySequentialMovement(init, EID_WHAT, [n], []),
 	
 		% The entity must be destroyed in next step (by OID turret)
@@ -194,7 +187,11 @@ automaticTurret(OID):-
         'pl-man':lang_message(automaticTurret, incorrect_instantiation, MSG),
 	maplist(user:write, ['(', OID, '): ', MSG, '\n']).
 	
-
+% Calculate X,Y location of the entity we are seeing
+p_calculateEntityXY(left, DIST, X, Y, NX, Y):- NX is X-DIST.
+p_calculateEntityXY(right, DIST, X, Y, NX, Y):- NX is X+DIST.
+p_calculateEntityXY(up, DIST, X, Y, X, NY):- NY is Y-DIST.
+p_calculateEntityXY(down, DIST, X, Y, X, NY):- NY is Y+DIST.
 	
 	
 	
