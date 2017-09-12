@@ -40,57 +40,86 @@ initMap:-
 
 	%% El functioner master
 
-	createGameEntity(OID_FUNCT0, '', non_interactive, 5, 5, active, functioner, 
+	%% Functioners al abrir la primera puerta
+
+	createGameEntity(OID_FUNCT0, '', non_interactive, 0, 0, active, functioner, 
 			[name(functioner), solid(false), static(true), use_rule(norule),
 			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
 
-	createGameEntity(OID_FUNCT1, '', non_interactive, 5, 5, active, functioner, 
+	createGameEntity(OID_FUNCT1, '', non_interactive, 0, 0, active, functioner, 
 			[name(functioner), solid(false), static(true), use_rule(norule),
 			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
 
-	createGameEntity(OID_FUNCT2, '', non_interactive, 5, 5, active, functioner, 
+	createGameEntity(OID_FUNCT2, '', non_interactive, 0, 0, active, functioner, 
 			[name(functioner), solid(false), static(true), use_rule(norule),
 			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
 
-	createGameEntity(OID_FUNCT3, '', non_interactive, 5, 5, active, functioner, 
+	createGameEntity(OID_FUNCT3, '', non_interactive, 0, 0, active, functioner, 
 			[name(functioner), solid(false), static(true), use_rule(norule),
 			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
 
-	createGameEntity(OID_FUNCT4, '', non_interactive, 5, 5, active, functioner, 
+	createGameEntity(OID_FUNCT4, '', non_interactive, 0, 0, active, functioner, 
 			[name(functioner), solid(false), static(true), use_rule(norule),
 			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
 
-	createGameEntity(OID_FUNCT5, '', non_interactive, 5, 5, active, functioner, 
+	createGameEntity(OID_FUNCT5, '', non_interactive, 0, 0, active, functioner, 
+			[name(functioner), solid(false), static(true), use_rule(norule),
+			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
+
+	%% Functioners al abrir la segunda puerta
+
+	createGameEntity(OID_FUNCT6, '', non_interactive, 0, 0, active, functioner, 
+			[name(functioner), solid(false), static(true), use_rule(norule),
+			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
+
+	createGameEntity(OID_FUNCT7, '', non_interactive, 0, 0, active, functioner, 
+			[name(functioner), solid(false), static(true), use_rule(norule),
+			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
+
+	createGameEntity(OID_FUNCT8, '', non_interactive, 0, 0, active, functioner, 
+			[name(functioner), solid(false), static(true), use_rule(norule),
+			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
+
+	createGameEntity(OID_FUNCT9, '', non_interactive, 0, 0, active, functioner, 
+			[name(functioner), solid(false), static(true), use_rule(norule),
+			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
+
+	createGameEntity(OID_FUNCT10, '', non_interactive, 0, 0, active, functioner, 
 			[name(functioner), solid(false), static(true), use_rule(norule),
 			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
 
 	%FUNCT_LIST = [],
 	
 	functioner(init, OID_FUNCT0, ['pl-man':createGameEntity(ALLY_SCOUT, 'ñ', mortal, 1, 2, active, entitySequentialMovement, [appearance(attribs(bold, green, default))]),
-	'pl-man':entitySequentialMovement(init, ALLY_SCOUT, [r,r,n,r,r,r,r,n,r,r,r,r,n,r,r,r,r,n,n,l,l,l,l,l,l,l,l,l,l,l,l,l,l], [no_repeat_moves]),
+	'pl-man':entitySequentialMovement(init, ALLY_SCOUT, [r,r,n,r,r,r,r,n,r,r,r,r,n,r,r,r,r,n,r,r,r,r,n,n,l,l,l,l,l,l,l,l,l,l,l,l,l,l,l,l,l,l], [no_repeat_moves]),
 'pl-man':createGameEntity(OID_FUNCT, '', non_interactive, 0, 0, active, functioner, []),
-'pl-man':functioner(init, OID_FUNCT, ['pl-man':destroyGameEntity(ALLY_SCOUT)], 33, 0) 
+'pl-man':functioner(init, OID_FUNCT, ['pl-man':destroyGameEntity(ALLY_SCOUT)], 42, 0) 
 ], 0, 0),
 
 	functioner(init, OID_FUNCT1, 
 ['pl-man':createGameEntity(OID_TURRET0, 'T', object, 3, 1, active, automaticTurret,
 			[name(torretaAutomatica4), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, magenta))]),
-	'pl-man':automaticTurret(init, OID_TURRET0, ['E','@'], [up,down,left,right], 2, [])], 3, 0),
+	'pl-man':automaticTurret(init, OID_TURRET0, ['E'], [up,down,left,right], 2, [])], 3, 0),
 
 	functioner(init, OID_FUNCT2, 
 ['pl-man':createGameEntity(OID_TURRET1, 'T', object, 7, 1, active, automaticTurret,
 			[name(torretaAutomatica), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, magenta))]),
-	'pl-man':automaticTurret(init, OID_TURRET1, ['E','@'], [up,down,left,right], 2, [])], 8, 0),
+	'pl-man':automaticTurret(init, OID_TURRET1, ['E'], [up,down,left,right], 2, [])], 8, 0),
 
 	functioner(init, OID_FUNCT3, 
 ['pl-man':createGameEntity(OID_TURRET2, 'T', object, 11, 1, active, automaticTurret,
 			[name(torretaAutomatica), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, magenta))]),
-	'pl-man':automaticTurret(init, OID_TURRET2, ['E','@'], [up,down,left,right], 2, [])], 13, 0),
+	'pl-man':automaticTurret(init, OID_TURRET2, ['E'], [up,down,left,right], 2, [])], 13, 0),
 
 	functioner(init, OID_FUNCT4, 
 ['pl-man':createGameEntity(OID_TURRET3, 'T', object, 15, 1, active, automaticTurret,
 			[name(torretaAutomatica), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, magenta))]),
-	'pl-man':automaticTurret(init, OID_TURRET3, ['E','@'], [up,down,left,right], 2, [])], 18, 0),
+	'pl-man':automaticTurret(init, OID_TURRET3, ['E'], [up,down,left,right], 2, [])], 18, 0),
+
+	functioner(init, OID_FUNCT5, 
+['pl-man':createGameEntity(OID_TURRET4, 'T', object, 19, 1, active, automaticTurret,
+			[name(torretaAutomatica), solid(false), static(true), use_rule(norule), description('Torreta automática de la reina'), appearance(attribs(bold, green, magenta))]),
+	'pl-man':automaticTurret(init, OID_TURRET4, ['E'], [up,down,left,right], 2, [])], 23, 0),
 
 
 	%% Capa de invisibilidad э
@@ -98,7 +127,7 @@ initMap:-
 	createGameEntity(OID_CAPA, '€', object, 2, 2, inactive, norule, 
 			[name(capa), solid(true), static(false), use_rule(norule),
 			description('Capa de invisibilidad, los enemigos no te verán'), appearance(attribs(bold, cyan, default))]),
-		*/
+*/
 	%% Rifle francotirador
 	createGameEntity(OID_FRANCOTIRADOR, 'L', object, 10, 13, inactive, norule,
 			[name(rifle_francotirador), solid(false), static(false), use_rule(gunSniper),
