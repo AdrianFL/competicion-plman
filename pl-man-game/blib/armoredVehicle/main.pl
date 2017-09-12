@@ -57,9 +57,10 @@
 :- module(armoredVehicle, [ armoredVehicle/1, armoredVehicle/9 ]).
 :- dynamic d_vehicleMove/3.
 :- dynamic d_components/2.
+:- dynamic d_vision/2.
 :- dynamic d_state/2.
 :- dynamic d_dotPosition/4.
-:- dynamic d_attackTime/4.
+:- dynamic d_attackTime/3.
 
 %% Init
 armoredVehicle(init, EID, INIT_MOVE, X, Y, X2, Y2, LIMITS, Counter):-
@@ -105,8 +106,8 @@ armoredVehicle(init, EID, INIT_MOVE, X, Y, X2, Y2, LIMITS, Counter):-
 	'pl-man':createGameEntity(PIEZA1, 'A', mortal, LocX, Y, inactive, norule, 
             [name(pieza1), solid(false), static(false), use_rule(norule), description('Armored vehicle component 1')]),!,
 	
-	LocX2 is X-1,
-	'pl-man':createGameEntity(PIEZA2, 'B', mortal, LocX2, Y, inactive, norule, 
+	LocY2 is Y-1,
+	'pl-man':createGameEntity(PIEZA2, 'B', mortal, X, LocY2, inactive, norule, 
             [name(pieza2), solid(false), static(false), use_rule(norule), description('Armored vehicle component 2')]),!,
 	
 	LocY is Y+1,
@@ -138,9 +139,13 @@ armoredVehicle(init, EID, INIT_MOVE, X, Y, X2, Y2, LIMITS, Counter):-
 
 	%appending pieces to vehicle's list of compoments
 	append([PIEZA1,PIEZA2,PIEZA3, PIEZA4, PIEZA5, PIEZA6, PIEZA7, PIEZACENTRO],[],LISTA),
+	append([PIEZA2,PIEZA3, PIEZACENTRO],[],VISION),
 
   retractall(d_components(EID,_)),
-	assert(d_components(EID,LISTA)), !.
+	assert(d_components(EID,LISTA)),
+
+	retractall(d_vision(EID,_)),
+	assert(d_vision(EID,VISION)),!.
 	
 
 % Ғ Ł Ҵ Ԥ Ԩ Ԫ Ц Ш
@@ -214,29 +219,29 @@ armoredVehicle(EID):-
 %%Movement to all pieces connected to this object      
 armoredVehicle(EID):-
 	%Check attack period, and if it's not attack time reduce 1 in counter
+	
+	(
+		(
+			d_attackTime(EID,Otime,Rtime),
+			Rtime =<1
+		) 
+		->
+		NewRTime = Otime
+		retract(d_attackTime(EID,_,_)),
+		assert(d_attackTime(EID,Otime,NewRTime))
+		;
+		
+	),
 
 	%vehicle can move
-	d_state(EID,move),!,
+	d_state(EID,move),
 
 	%Take data
 	d_vehicleMove(EID, DIR, LIMITS),
 
 	%Verify an obstacle is not in the way of the vehicle
-	%'pl-man':see(EID, list, DIR, X),
-	%nth0(3,X,Object),
-	%not(member(Object, LIMITS)),
-	
-	forall(
-		(
-			d_components(EID, LISTA),member(PIEZA,LISTA)	
-		)
-		,
-		(
-			'pl-man':see(PIEZA,list,DIR,X),
-			nth0(1,X,Object),
-			not(member(Object,LIMITS))
-		)
-	),!,
+	countObstacles(EID,Number),
+	Number =< 0,!,
 
 	%%Apply to all vehicles pieces the movement
   'pl-man':doAction(EID, move(DIR)),
@@ -288,6 +293,28 @@ countComponents(r, [H|T], C, I):-
 countComponents(EID,Number):-
 	d_components(EID,List),
 	countComponents(r, List, 0, Number).
+
+%%Counting number of obstacles in the way
+countObstacles(EID,[],C,C).
+countObstacles(EID,[H|T],C, I):-
+	(
+			(
+				d_vehicleMove(EID, DIR, LIMITS),
+				'pl-man':see(H, list, DIR, X),
+				nth0(2,X,Object),
+				member(Object, LIMITS)
+			)
+			->
+			Counter is C+1
+			;
+			Counter = C
+		
+	),
+	countObstacles(EID,T,Counter, I).
+
+countObstacles(EID,Counter):-
+	d_vision(EID,List),
+	countObstacles(EID,List,0,Counter).
 
 % Next movement direction when the enemy arrives to a limit
 p_enemyNextDir(left, right).
