@@ -77,7 +77,7 @@ ai:- todo('#','.','#',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(dow
 ai:- todo(' ',' ','#','#','#',' ',' ',' '), havingObject(appearance('L')), m(up).
 ai:- todo(' ',' ',' ','#',' ',' ',' ',' '), havingObject(appearance('L')), m(up).
 ai:- todo(' ',' ',' ',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(left).
-ai:- todo(' ',' ',' ',' ',' ','#','#','#'), havingObject(appearance('L')), avistar(right,'E'), u(right), actualizarBalas.
+ai:- todo(' ',' ',' ',' ',' ','#','#','#'), havingObject(appearance('L')), avistar(right,'E'), m(none), actualizarBalas.
 ai:- s(left,'#'), s(left-up,'#'), s(left-down,'#'), not(s(up,'#')), safeMove(up,' '), m(up).
 ai:- s(up,'#'), s(left-up,'#'), s(left,'#'), safeMove(right), m(right), ce(areaCentral).
 

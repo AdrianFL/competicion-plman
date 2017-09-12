@@ -49,7 +49,7 @@ load_behaviour(lightTrafficBlock).
 map([
 ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', ' ', '#'],
-['#', '.', '.', '#', '#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', '.', '.', '.', '.', '.', '.', '.', '#', ' ', '#', '#'],
+['#', '.', '.', '#', '#', '.', '#', '#', '#', '#', '#', '#', '#', '#', '#', '.', '#', '.', '.', '.', '.', '.', '.', '.', '#', ' ', '#', '#'],
 ['#', '.', '.', '.', '#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', ' ', ' ', '#'],
 ['#', '.', '.', '.', '.', '#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', '.', '.', '.', '.', '.', '.', '.', '.', '#', ' ', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#', ' ', ' ', '#'],
@@ -99,11 +99,12 @@ initMap:-
 		[ app('E'), name(enemigo), crule(entitySequentialMovement), appearance(attribs(normal, magenta, default)) ],
 		[ EID_RP2, 'pl-man':entitySequentialMovement(init, EID_RP2, RP2_MOVEMENT, [no_repeat_moves]) ], [ probRespawn(100) ]),
 	
-	%% Enemigos normales
-	ECM_RU = [n,n,r,n,n,n,u,n,n,r,n,l,n,n,u,n,n,n,l], % Entity central movement (right)
-	ECM_LU = [n,n,l,n,n,n,u,n,n,l,n,r,n,n,u,n,n,n,r],
-	ECM_RD = [n,n,r,n,n,n,d,n,n,r,n,l,n,n,d,n,n,n,l], % Entity central movement (right)
-	ECM_LD = [n,n,l,n,n,n,d,n,n,l,n,r,n,n,d,n,n,n,r],
+	%% Enemigos normales:
+	%% 
+	ECM_RU = [n,n,r,n,n,n,u,n,n,r,n,l,n,n,u,n,n,n,l], % Entity central movement (right-up)
+	ECM_LU = [n,n,l,n,n,n,u,n,n,l,n,r,n,n,u,n,n,n,r], % left-up
+	ECM_RD = [n,n,r,n,n,n,d,n,n,r,n,l,n,n,d,n,n,n,l], % right-down
+	ECM_LD = [n,n,l,n,n,n,d,n,n,l,n,r,n,n,d,n,n,n,r], % left-down
 	ECM_UD = [u,n,u,d,n,d],
 /*
 	ECM_RU = [n,n,r,n,n,n,u,n,n,r,n,n,u,n,n,r], % Entity central movement (right)
@@ -115,10 +116,11 @@ initMap:-
 	append(ECM_RU,ECM_LD,ECM_LTOR),
 	append(ECM_LU,ECM_RD,ECM_RTOL),
 */
-	append(ECM_RU,ECM_RD,ECM_1),
-	append(ECM_LU,ECM_LD,ECM_2),
-	append(ECM_1,ECM_UD,ECM_LTOR),
-	append(ECM_2,ECM_UD,ECM_RTOL),
+	append(ECM_RU,ECM_RD,ECM_0),
+	append(ECM_LU,ECM_LD,ECM_1),
+	append(ECM_0,ECM_UD,ECM_LTOR),
+	append(ECM_1,ECM_UD,ECM_RTOL),
+
 	createGameEntity(EID_0, 'E', mortal, 7, 6, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
 	entitySequentialMovement(init, EID_0, ECM_LTOR, [no_repeat_moves]),
 	createGameEntity(EID_1, 'E', mortal, 8, 6, active, entitySequentialMovement, [appearance(attribs(normal, yellow, default))]),
@@ -129,17 +131,52 @@ initMap:-
 	createGameEntity(EID_3, 'E', mortal, 14, 6, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
 	entitySequentialMovement(init, EID_3, ECM_RTOL, [no_repeat_moves]),
 
+	%% 
+
+	ECM2_LU = [n,u,n,n,u,n,d,n,n,d],
+	ECM2_RD = [n,d,n,n,d,n,u,n,n,u],
+	ECM2_D = [d,d],
+	ECM2_U = [u,u],
+
+	% Enemigos izquierda
+	append(ECM2_LU, ECM2_D, ECM2_LD0), % Repetición completa bajando
+	append(ECM2_LU, ECM2_U, ECM2_LU0), % Repetición completa subiendo
+
+	append(ECM2_LD0, ECM2_LD0, ECM2_LD1), % Doble repetición
+	append(ECM2_LU0, ECM2_LU0, ECM2_LU1), 
+	
+	append(ECM2_LD1, ECM2_LU1, ECM2_L4),
+
+	% Enemigos derecha
+	append(ECM2_RD, ECM2_D, ECM2_RD0),
+	append(ECM2_RD, ECM2_U, ECM2_RU0),
+
+	append(ECM2_RD0, ECM2_RD0, ECM2_RD1),
+	append(ECM2_RU0, ECM2_RU0, ECM2_RU1),
+
+	append(ECM2_RD1, ECM2_RU1, ECM2_R4),
+
+	createGameEntity(EID_4, 'E', mortal, 18, 4, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
+	entitySequentialMovement(init, EID_4, ECM2_L4, [no_repeat_moves]),
+	createGameEntity(EID_5, 'E', mortal, 19, 4, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
+	entitySequentialMovement(init, EID_5, ECM2_L4, [no_repeat_moves]),
+
+	createGameEntity(EID_6, 'E', mortal, 21, 2, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
+	entitySequentialMovement(init, EID_6, ECM2_R4, [no_repeat_moves]),
+	createGameEntity(EID_7, 'E', mortal, 22, 2, active, entitySequentialMovement, [appearance(attribs(normal, red, default))]),
+	entitySequentialMovement(init, EID_7, ECM2_R4, [no_repeat_moves]),
+
 	% Bloques semáforo (easter egg al próximo mapa)
 
-	createGameEntity(OID_LTB0, '=', object, 26, 3, active, lightTrafficBlock,
+	createGameEntity(OID_LTB0, '=', object, 26, 1, active, lightTrafficBlock,
 			[name(bloque_semaforo), solid(true), static(true), use_rule(norule),
 			description('Bloque semáforo decorativo'), appearance(attribs(normal, red, default))]),
-	lightTrafficBlock(init, OID_LTB0, 0, 1, 1, 26, 3),
+	lightTrafficBlock(init, OID_LTB0, 0, 1, 1, 26, 1),
 
 	createGameEntity(OID_LTB1, '=', object, 26, 9, active, lightTrafficBlock,
 			[name(bloque_semaforo), solid(true), static(true), use_rule(norule),
 			description('Bloque semáforo decorativo'), appearance(attribs(normal, red, default))]),
-	lightTrafficBlock(init, OID_LTB1, 0, 1, 1, 26, 3).
+	lightTrafficBlock(init, OID_LTB1, 0, 1, 1, 26, 9).
 	
 	
 	
