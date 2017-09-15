@@ -22,44 +22,48 @@ u(D):- doAction(use(D)).
 % Comprobación desde arriba hasta arriba-izquierda
 todo(U, RU, R, RD, D, LD, L, LU):- s(up,U), s(right-up, RU), s(right,R),s(right-down,RD), s(down,D), s(left-down,LD),s(left,L), s(left-up,LU).
 
-% Avistar una entidad sin importar la distancia
+% Avistar al menos una entidad sin importar la distancia
 avistar(DIR,OBJ):- see(list,DIR,LIST), nth0(_,LIST,OBJ).
 
-% Coco o espacio sin la posibilidad de que pueda entrar un enemigo a la dirección especificada
-safeMove(DIR,DOT_SPACE):-
-( ( DOT_SPACE = '.' ; DOT_SPACE = ' ' ) ->
-  s(DIR,DOT_SPACE)
-  ; writeln('Carácter no reconocido'), true
-),
+/*% Devuelve la cantidad de apariencias de una entidad en una dirección
+contarApariencias(recursion, [], _, C, C).
+contarApariencias(recursion, [H|T], LS, C, I):-
+	( member(H,LS) -> NewCantidad is C+1
+	        ;  NewCantidad = C
+	),
+	contarApariencias(recursion, T, LS, NewCantidad, I).
 
-not(s(DIR,'E')), not(s(DIR,'F')), not(s(DIR,'#')), see(list,DIR,LIST), not(nth0(1,LIST,'E')), not(nth0(1,LIST,'F')),
+contarApariencias(DIR, LS, A):-
+	is_list(LS),
+	see(list,DIR,Lista),	
+	contarApariencias(recursion, Lista, LS, 0, A).
 
-( DIR = up -> 
-not(s(right-up,'E')), not(s(right-up,'F')), not(s(left-up,'E')), not(s(left-up,'F'))
-; ( DIR = right -> 
-  not(s(right-up,'E')), not(s(right-up,'F')), not(s(right-down,'E')), not(s(right-down,'F'))
-  ; ( DIR = down -> 
-    not(s(right-down,'E')), not(s(right-down,'F')), not(s(left-down,'E')), not(s(left-down,'F'))
-    ; not(s(left-up,'E')), not(s(left-up,'F')), not(s(left-down,'E')), not(s(left-down,'F'))
-    )
-  )
-).
+% ---*/
 
-% Procedimiento anterior con 1 parámetro (ignorando coco o espacio)
-safeMove(DIR):-
+% Comprobar si existe la posibilidad de que puedan entrar entidades mortales en la dirección especificada
+safeMove(DIR, L_MORTAL):-
+member(DIR,[up,right,down,left]),
+is_list(L_MORTAL),
 
-not(s(DIR,'E')), not(s(DIR,'F')), not(s(DIR,'#')), see(list,DIR,LIST), not(nth0(1,LIST,'E')), not(nth0(1,LIST,'F')),
+not(s(DIR,'#')), % Para agilizar, ya que este functor sirve para moverse
 
-( DIR = up -> 
-not(s(right-up,'E')), not(s(right-up,'F')), not(s(left-up,'E')), not(s(left-up,'F'))
-; ( DIR = right -> 
-  not(s(right-up,'E')), not(s(right-up,'F')), not(s(right-down,'E')), not(s(right-down,'F'))
-  ; ( DIR = down -> 
-    not(s(right-down,'E')), not(s(right-down,'F')), not(s(left-down,'E')), not(s(left-down,'F'))
-    ; not(s(left-up,'E')), not(s(left-up,'F')), not(s(left-down,'E')), not(s(left-down,'F'))
-    )
-  )
-).
+forall(
+	(member(ENEMY, L_MORTAL)),
+		(
+			(not(s(DIR,ENEMY))), see(list,DIR,LIST), not(nth0(1,LIST,ENEMY)),
+
+			( DIR = up -> 
+			not(s(right-up,ENEMY)), not(s(left-up,ENEMY))
+			; ( DIR = right -> 
+			  not(s(right-up,ENEMY)), not(s(right-down,ENEMY))
+			  ; ( DIR = down -> 
+				not(s(right-down,ENEMY)), not(s(left-down,ENEMY))
+				; not(s(left-up,ENEMY)), not(s(left-down,ENEMY))
+				)
+			  )
+			)			
+		)
+	).
 
 % Comprueba si @ está rodeado de algún enemigo, con lo cual quedándose quieto no morirá
 safeStand:- not(s(up,'E')), not(s(up,'F')), not(s(right,'E')), not(s(right,'F')), not(s(down,'E')), not(s(down,'F')), not(s(left,'E')), not(s(left,'F')).
@@ -70,31 +74,31 @@ reg:- not(havingObject(appearance('L'))), s(left,'L'), g(left), obtenerArma(5), 
 reg:- not(havingObject(appearance('L'))), not(s(left,'L')), m(left).
 
 ai:- member(DIR,[down,left,up,right]), avistar(DIR,'F'), havingObject(appearance('L')), u(DIR), actualizarBalas.
-ai:- member(DIR,[down,left,up,right]), safeMove(DIR,'.'), m(DIR).
+ai:- member(DIR,[down,left,up,right]), safeMove(DIR,['E','F']), s(DIR,'.'), m(DIR).
 ai:- todo('#','#','#','.',' ',' ',' ',' '), havingObject(appearance('L')), m(down).
 ai:- todo(' ','#','.',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(right).
 ai:- todo('#','.','#',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(down).
 ai:- todo(' ',' ','#','#','#',' ',' ',' '), havingObject(appearance('L')), m(up).
 ai:- todo(' ',' ',' ','#',' ',' ',' ',' '), havingObject(appearance('L')), m(up).
-ai:- todo(' ',' ',' ',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(left).
-ai:- todo(' ',' ',' ',' ',' ','#','#','#'), havingObject(appearance('L')), avistar(right,'E'), m(none), actualizarBalas.
-ai:- s(left,'#'), s(left-up,'#'), s(left-down,'#'), not(s(up,'#')), safeMove(up,' '), m(up).
-ai:- s(up,'#'), s(left-up,'#'), s(left,'#'), safeMove(right), m(right), ce(areaCentral).
+ai:- todo(' ',' ',' ',' ',' ',' ',' ',' '), havingObject(appearance('L')), safeMove(left,['F']), m(left).
+ai:- todo(' ',' ',' ',' ',' ','#','#','#'), havingObject(appearance('L')), contarApariencias(right,['E'],COUNT), COUNT >= 8, u(right), actualizarBalas.
+ai:- s(left,'#'), s(left-up,'#'), s(left-down,'#'), not(s(up,'#')), safeMove(up,['E','F']), s(up,' '), m(up).
+ai:- s(up,'#'), s(left-up,'#'), s(left,'#'), safeMove(right,['E','F']), m(right), ce(areaCentral).
 
 % No quedarse atrapado en un rincón con F persiguiéndome, intentar escapar
-ac:- s(right-down,'#'), s(right-up,'#'), see(list,left,L), nth0(1,L,'F'), see(list,right,R), nth0(1,R,'#'), safeMove(down), m(down).
-ac:- s(right-down,'#'), s(right-up,'#'), see(list,left,L), nth0(1,L,'F'), see(list,right,R), nth0(1,R,'#'), not(safeMove(down)), safeStand, m(none).
+ac:- s(right-down,'#'), s(right-up,'#'), see(list,left,L), nth0(1,L,'F'), see(list,right,R), nth0(1,R,'#'), safeMove(down,['E','F']), m(down).
+ac:- s(right-down,'#'), s(right-up,'#'), see(list,left,L), nth0(1,L,'F'), see(list,right,R), nth0(1,R,'#'), not(safeMove(down,['E','F'])), safeStand, m(none).
 % --
 
 % Salir del rincón (arriba)
-ac:- todo('#','#','#',' ','#','.',' ','#'), safeMove(left), m(left).
+ac:- todo('#','#','#',' ','#','.',' ','#'), safeMove(left,['E','F']), m(left).
 % (abajo)
-ac:- s(up,'#'), s(right-up, ' '), s(right,'#'),s(right-down,'#'), s(down,'#'), s(left-down,'#'),s(left,' '), safeMove(left), m(left).
+ac:- s(up,'#'), s(right-up, ' '), s(right,'#'),s(right-down,'#'), s(down,'#'), s(left-down,'#'),s(left,' '), safeMove(left,['E','F']), m(left).
 % --
-ac:- safeMove(right,'.'), m(right).
-ac:- safeMove(left,'.'), m(left).
-ac:- safeMove(down,'.'), m(down).
-ac:- safeMove(up,'.'), m(up).
+ac:- safeMove(right,['E','F']), s(right,'.'), m(right).
+ac:- safeMove(left,['E','F']), s(left,'.'), m(left).
+ac:- safeMove(down,['E','F']), s(down,'.'), m(down).
+ac:- safeMove(up,['E','F']), s(up,'.'), m(up).
 
 
 /*
@@ -106,7 +110,6 @@ reg:- see(normal,right,'L'), doAction(get(right)).
 reg:- not(see(normal,right,'L')), not(see(normal,right,'#')), doAction(move(right)).
 reg:- doAction(move(none)).
 */
-
 
 
 rej:- estado(esperarAlineamiento), ea.
