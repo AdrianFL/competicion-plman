@@ -202,39 +202,79 @@ armoredVehicle(EID):-
 		%destroy object itself
 		'pl-man':destroyGameEntity(EID),!.
 
-
 %%
-%%% VEHICLE MOVEMENT
-%%  
-
+%%% VEHICLE ATTACK
+%% 
+ 
 %%If it is on attack, then launch missil in order   
 armoredVehicle(EID):-
 	%vehicle on attack mode
 	d_state(EID,attack),!,
 
-	false
+	%launch missiles in turns
+		%Check attack period, and if it's not attack time reduce 1 in counter
+	(
+		(
+			d_attackTime(EID ,_ ,Rtime),
+			Rtime =<0
+		) 
+		->
+		(
+			retract(d_attackTime(EID, Otime2 ,_)),
+			NewRTime = Otime2,
+			assert(d_attackTime(EID, Otime2 ,NewRTime)),
 
-	,!.
+			%change state to attack mode
+			retract(d_state(EID, _)),
+			assert(d_state(EID,move))
+		)
+		;
+		(
+			retract(d_attackTime(EID ,Otime3 ,Rtime3)),
+			maplist(user:write, ['(Está bien atacando)\n']),
+			NewRTime2 is Rtime3-1,
+			assert(d_attackTime(EID,Otime3,NewRTime2))
+		)
+	),
+	
+	maplist(user:write, ['(Está atacando)\n']),!.
+
+%%
+%%% VEHICLE MOVEMENT
+%% 
 
 %%Movement to all pieces connected to this object      
 armoredVehicle(EID):-
-	%Check attack period, and if it's not attack time reduce 1 in counter
-	
-	(
-		(
-			d_attackTime(EID,Otime,Rtime),
-			Rtime =<1
-		) 
-		->
-		NewRTime = Otime
-		retract(d_attackTime(EID,_,_)),
-		assert(d_attackTime(EID,Otime,NewRTime))
-		;
-		
-	),
 
 	%vehicle can move
 	d_state(EID,move),
+
+	%Check attack period, and if it's not attack time reduce 1 in counter
+	(
+		(
+			d_attackTime(EID ,_ ,Rtime),
+			Rtime =<0
+		) 
+		->
+		(
+			retract(d_attackTime(EID, Otime2 ,_)),
+			NewRTime = 3,
+			assert(d_attackTime(EID, Otime2 ,NewRTime)),
+
+			%change state to attack mode
+			retract(d_state(EID, _)),
+			assert(d_state(EID,attack))
+		)
+		;
+		(
+			retract(d_attackTime(EID ,Otime3 ,Rtime3)),
+			maplist(user:write, ['(Está bien)\n']),
+			NewRTime2 is Rtime3-1,
+			assert(d_attackTime(EID,Otime3,NewRTime2))
+		)
+	),
+
+	
 
 	%Take data
 	d_vehicleMove(EID, DIR, LIMITS),
