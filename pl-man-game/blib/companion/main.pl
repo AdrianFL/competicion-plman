@@ -55,22 +55,71 @@
 % Once it has done all the movements from the list, it
 % cycles again.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- module(companion, [ companion/1, companion/4 ]).
+:- module(companion, [ companion/1, companion/7 ]).
 
 % d_entityStatus(EID, was_on(X, Y, Appearance), NextMoveNum, MoveList, Modifiers)
 :- dynamic d_entityStatus/5.
 
+% disarmed, not carrying a weapon; armed, carrying a weapon;
+:- dynamic d_itemStatus/6.
+
 % Init Sequence
-companion(init, EID, MOVE_LIST, MODIF_LIST):-
+companion(init, EID, MOVE_LIST, MODIF_LIST, ITEM_LIST, AIM_LIST, DIRECTIONS_LIST):-
 	number(EID),
 	is_list(MOVE_LIST),
 	is_list(MODIF_LIST),
+	is_list(ITEM_LIST),
+	is_list(AIM_LIST),
+	is_list(DIRECTIONS_LIST),
 	'pl-man':entityLocation(EID,_ , _, Ap),
 	retractall(d_entityStatus(EID, _, _, _, _)),
-	assert(d_entityStatus(EID, was_on(-100,-100,Ap), 0, MOVE_LIST, MODIF_LIST)), !.
-companion(init, EID, _, _):-
+	retractall(d_itemStatus(EID, _, _, _, _, _)),
+	assert(d_entityStatus(EID, was_on(-100,-100,Ap), 0, MOVE_LIST, MODIF_LIST)),
+	assert(d_itemStatus(EID, ITEM_LIST, AIM_LIST, DIRECTIONS_LIST, disarmed, _)), !.
+
+companion(init, EID, _, _, _, _, _):-
         'pl-man':lang_message(entitySequentialMovement, bad_parameters, MSG),
 	maplist(user:write, [MSG, EID, '\n']).
+
+% Control to gather items --------------------------
+
+% Grab a weapon
+companion(EID):-
+	d_itemStatus(EID, L_ITEMS, L_AIM, L_DIR, disarmed, _), % Make sure companion is not carry anything
+	member(DIR,L_DIR),
+	'pl-man':see(EID, normal, DIR, WHAT),
+	member(WHAT, L_ITEMS),
+	'pl-man':entityLocation(EID, X, Y, _),
+
+	% Gather the item in its respective direction
+	newdir(DIR,X,Y,NewX,NewY),
+	'pl-man':getObjectFrom(EID,NewX,NewY),
+	retract(d_itemStatus(EID, _, _, _, _, _)),
+	assert(d_itemStatus(EID, L_ITEMS, L_AIM, L_DIR, armed, WHAT)), % Update status (companion now armed) 
+
+	'pl-man':entityLocation(EID, _, _, Ap), % Recupero la apariencia para mostrarla en el mensaje
+	maplist(user:write, ['Tu compañero "', Ap, '" ha recogido (', WHAT, ' )\n']).
+
+% Use a weapon
+companion(EID):-
+	d_itemStatus(EID, L_ITEMS, L_AIM, L_DIR, armed, ITEM_APP), % Make sure companion is armed
+	member(DIR,L_DIR),
+	'pl-man':see(EID, list, DIR, SEELIST),
+	member(AIM, L_AIM),
+	member(AIM, SEELIST),
+
+	'pl-man':entityLocation(EID, X, Y, _), % Retrieve X and Y coordinates to convert them
+	newdir(DIR,X,Y,NewX,NewY), 
+	'pl-man':useObjectTo(EID, DIR, NewX, NewY), % Use the object (aren't NewX and NewY unnecessary? Anyway, it works)
+
+	( not('pl-man':havingObject(EID, appearance(ITEM_APP))) ->
+	  retract(d_itemStatus(EID, _, _, _, armed, _)),
+	  assert(d_itemStatus(EID, L_ITEMS, L_AIM, L_DIR, disarmed, _))
+	;
+	  true
+	).
+	  
+% ---------------
 
 % Control Sequence
 companion(EID):-
@@ -135,3 +184,14 @@ p_convertToAction(rand(L), ACTION):-
 	X is random(LEN),
 	nth0(X, L, CONV), 
 	p_convertToAction(CONV, ACTION).
+
+% Subrules to itemStatus
+%%Add directions
+newdir(up,X,Y,NewX,NewY):- NewX is X, NewY is Y-1. 
+newdir(up-right,X,Y,NewX,NewY):- NewX is X+1, NewY is Y-1. 
+newdir(up-left,X,Y,NewX,NewY):- NewX is X-1, NewY is Y-1. 
+newdir(down,X,Y,NewX,NewY):- NewX is X, NewY is Y+1. 
+newdir(down-right,X,Y,NewX,NewY):- NewX is X+1, NewY is Y+1. 
+newdir(down-left,X,Y,NewX,NewY):- NewX is X-1, NewY is Y+1. 
+newdir(right,X,Y,NewX,NewY):- NewX is X+1, NewY is Y. 
+newdir(left,X,Y,NewX,NewY):- NewX is X-1, NewY is Y. 
