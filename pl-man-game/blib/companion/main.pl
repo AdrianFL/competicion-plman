@@ -81,7 +81,14 @@ companion(init, EID, _, _, _, _, _):-
         'pl-man':lang_message(entitySequentialMovement, bad_parameters, MSG),
 	maplist(user:write, [MSG, EID, '\n']).
 
-% Control to gather items --------------------------
+% Control to gather dots
+companion(EID):-
+	'pl-man':entityLocation(EID, X, Y, _),
+	'pl-man':getDMap(Map),
+	'pl-man':eatDot(EID, companion, Map, X, Y), % *** functor añadido en pl-man ***
+	 false.
+
+% Control to gather items
 
 % Grab a weapon
 companion(EID):-
