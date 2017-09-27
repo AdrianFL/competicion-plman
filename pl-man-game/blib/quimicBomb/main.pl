@@ -230,19 +230,9 @@ gas(OID):-
 
 
 				%Checking location
-				/*(
-				'pl-man':entityLocation(OID_NEXT, NewX, NewY, _) 
-					->
-				not('pl-man':solidEntity(OID_NEXT)) 
-				),!,*/
-%maplist(user:write, ["EH que peta la direccion: ", Dir, ' en la pos ',X,' - ',Y, ' ----- ',NewX,' - ',NewY,'\n']),!,
-
-			%%%%%%%%%%%PROVISIONAL%%%%%%%%%%%%%%%%%%%%%%%%
-				(not(member(What,['#','~','*','˞','·'])) ->
-	
-
 			
-		  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+				(not(member(What,['#','~','*','˞','·'])) ->
+			
 
 				%% Los 4 ifs que determinan el dibujo del gas
 				(What = '.' -> Format = '*' , App = [appearance(attribs(bold, yellow, red))] 
