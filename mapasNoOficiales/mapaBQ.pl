@@ -33,7 +33,7 @@ initMap:-
 	createGameEntity(OID_BQ, 'Ǒ', object, 2, 3, active, quimicBomb,
 		[name(bomba_quimica), solid(false), static(true), use_rule(norule),
 			description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))]),
-	quimicBomb(init,OID_BQ, 1, 4, 15, [ no_destroy(['.']) ]). % Cambiad el 15 por 14 para vez el caso especial
+	quimicBomb(init,OID_BQ, 1, 4, 15, [ no_destroy(['.']) ]). % Cambiar el 15 por 14 para ver el caso especial
 
 norule(_).
 norule(_,_,_,_,_).
