@@ -23,7 +23,7 @@ initMap:-
 
 	createGameEntity(OID_LTB, '=', object, 9, 3, active, lightTrafficBlock,
 			[name(bomba_quimica), solid(true), static(true), use_rule(norule),
-			description('Bomba química que infecta una sala'), appearance(attribs(normal, red, default))]),
+			description('Bloque semáforo'), appearance(attribs(normal, red, default))]),
 	lightTrafficBlock(init, OID_LTB, 1, 4, 1, 9, 3).	
 	
 norule(_).

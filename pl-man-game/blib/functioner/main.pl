@@ -41,15 +41,18 @@
 %
 % Example
 %--------------------
-% createGameEntity(OID_D, '/', object, 1, 4, inactive, norule, 
-%                 data(puerta, solid, static, norule, 'Puerta que se abre con la llave azul')), 
-% createGameEntity(OID_A, '-', object, 8, 5, inactive, norule, 
-%                 data(llave_azul, not_solid, not_static, basicDoorKey, 'Llave Azul')),
-% basicDoorKey(init, OID_D, 
-%	['pl-man':destroyGameEntity(OID_D), 'pl-man':destroyGameEntity(OID_A)], [OID_A]).
+% createGameEntity(OID_FUNCT0, '', non_interactive, 0, 0, active, functioner, 
+%			[name(functioner), solid(false), static(true), use_rule(norule),
+%			description('Objeto que llamará funciones del sistema'), appearance(attribs(normal, default, default))]),
 %
-% Creates a door that can only be opened with 'llave_azul'.
-% The door and the key simply vanish when the door is opened.
+% functioner(init, OID_FUNCT0, 
+%  ['pl-man':createGameEntity(ALLY_SCOUT, 'ñ', mortal, 1, 2, active, entitySequentialMovement, [appearance(attribs(bold, green, default))]),
+%  'pl-man':entitySequentialMovement(init, ALLY_SCOUT, [r,r,l,l,l], %[no_repeat_moves]),
+%  'pl-man':createGameEntity(OID_FUNCT, '', non_interactive, 0, 0, active, functioner, []),
+%  'pl-man':functioner(init, OID_FUNCT, ['pl-man':destroyGameEntity(ALLY_SCOUT)], 42, 0) 
+%  ], 0, 0),
+%
+% Creates a functioner that calls a variable number of pl-man functors
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- module(functioner, [ functioner/5, functioner/1 ] ).

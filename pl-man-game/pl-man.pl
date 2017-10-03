@@ -379,6 +379,15 @@ eatDot(EID, Map, X, Y):-
 	dotEaten, !.
 eatDot(_, _, _, _).
 
+% *** Compañero ***
+eatDot(EID, companion, Map, X, Y):-
+	not(entityType(EID, pacman)),
+	getCellContent(X, Y, Map, '.'),
+	updateCellContent(X, Y, ' ', Map, NewMap),
+	updateDMap(NewMap), 
+	mainLog(append_c( um(X, Y, '\' \'') )),
+	dotEaten, !.
+% *****************
 moveEntity(EID, Map, X, Y):-
 	eatDot(EID, Map, X, Y),
  	retract(d_entity(EID, Type, Status, ControlRule, location(_,_,Ap))),
