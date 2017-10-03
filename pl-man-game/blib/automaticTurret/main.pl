@@ -70,7 +70,7 @@ automaticTurret(init, OID, L_AIM, L_DIR, DELAY, L_PARAMS):-
 	integer(DELAY), DELAY >= 0, 
 	is_list(L_AIM),
 	is_list(L_DIR),
-	length(L_DIR,LENGTH), LENGTH > 0,
+	length(L_DIR,LENGTH), LENGTH >= 1, LENGTH =< 4,
 	is_list(L_PARAMS),
 	
 	correctListMembers(L_DIR, [up,down,left,right]), %% Checks if the list has valid directions
@@ -82,12 +82,6 @@ automaticTurret(init, OID, L_AIM, L_DIR, DELAY, L_PARAMS):-
 automaticTurret(init, OID, _, _, _, _):-
     	'pl-man':lang_message(automaticTurret, bad_parameters, MSG),
 	maplist(user:write, [MSG, OID, ')\n']).
-
-% Aux predicate
-correctListMembers([],_).
-correctListMembers([H|T], LIST):-
-	member(H,LIST),
-	correctListMembers(T, LIST).
 
 %%%
 %%% Control
@@ -186,6 +180,12 @@ automaticTurret(OID):-
 	not(d_automaticTurretStatus(OID, _, _, _, _, _)),
         'pl-man':lang_message(automaticTurret, incorrect_instantiation, MSG),
 	maplist(user:write, ['(', OID, '): ', MSG, '\n']).
+
+% Aux predicate
+correctListMembers([],_).
+correctListMembers([H|T], LIST):-
+	member(H,LIST),
+	correctListMembers(T, LIST).
 	
 % Calculate X,Y location of the entity we are seeing
 p_calculateEntityXY(left, DIST, X, Y, NX, Y):- NX is X-DIST.

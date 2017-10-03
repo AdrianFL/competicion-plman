@@ -1,5 +1,7 @@
 :-use_module('pl-man-game/main').
 
+rej:- havingObject, doAction(use(right)).
+rej:- see(normal,right,'i'), doAction(get(right)).
 rej:- doAction(move(none)).
 
 

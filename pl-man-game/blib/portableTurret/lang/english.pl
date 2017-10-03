@@ -3,7 +3,7 @@
 % Pl-man is a puzzle game inspired in the popular game pacman, and it is mainly aimed
 % to teach programming in PROLOG and introductory courses of Artifial Intelligence.
 %
-% Copyright (C) 2007-2008 Francisco Gallego <ronaldo@cheesetea.com>
+% Copyright (C) 2007-2009 Francisco Gallego <ronaldo@cheesetea.com>
 % Departamento de Ciencia de la Computación e Inteligencia Artificial
 % Universidad de Alicante
 % Campus de San Vicente
@@ -25,36 +25,9 @@
 %
 
 %%
-%%  Main
-%%    
-%%	Loader of the Prolog-pacman game
-%%	
-:- module(main, [havingObject/0, havingObject/1, see/3, play/2, play/3, play/4, replay/2, doAction/1]).
-
-% Modules
-:- use_module('pl-man').
-:- use_module('modules/cheeseEngine').
-:- use_module('modules/cheeseText').
-
-%%	
-%% System-predicates redefinitions
-%%	
-:-redefine_system_predicate(user:write(_)).
-user:write(T) :- 
-	p_logWrite(T),
-	msgWindowWrite(T).
-:-redefine_system_predicate(user:writeln(_)).
-user:writeln(T) :- 
-	p_logWrite(T),
-	p_logWrite('\n'),
-	msgWindowWriteln(T).
-:-redefine_system_predicate(user:nl).
-user:nl :-
-	p_logWrite('\n'), 
-	msgWindowNl.
-
-p_logWrite(_):- not('pl-man':d_logging(_)), !.
-p_logWrite(MSG):-
-	swritef(S, '%q', [MSG]),
-	'pl-man':mainLog(append_c(w(S))).
-
+%% Warning messages
+%%
+lang_message(automaticArcher, bad_parameters, 'ERROR: Bad parameters instantiating automaticArcher/6 for object with OID: ').
+lang_message(automaticArcher, bad_parameters_bullet, 'ERROR: Bad parameters instantiating automaticArcherBullet/3 for object with OID: ').
+lang_message(automaticArcher, incorrect_instantiation, 'ERROR: automaticArcher is not correctly instantiated.').
+lang_message(automaticArcher, incorrect_instantiation_bullet, 'ERROR: automaticArcherBullet is not correctly instantiated.').

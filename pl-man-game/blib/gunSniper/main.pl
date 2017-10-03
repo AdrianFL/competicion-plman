@@ -71,6 +71,7 @@ gunSniper(OID, _, _, _, _):-
         'pl-man':lang_message(gunSniper, out_of_ammo, MSG),
         maplist(user:write, [MSG, '\n']),
         !.
+
 % Mientras queden balas
 gunSniper(OID, EID, X, Y, DIR):-
 	d_basicSniperStatus(OID, AMMO, AIMLIST, GUN_END),
@@ -78,7 +79,7 @@ gunSniper(OID, EID, X, Y, DIR):-
         'pl-man':lang_message(gunSniper, BANG_MESSAGE, MSG), % Totalmente impredecible
         user:writeln(MSG),
 
-  	contarApariencias(DIR, AIMLIST, COUNT), %% Chorrada que viene a continuación
+  	'pl-man':contarApariencias(DIR, AIMLIST, COUNT), %% Chorrada que viene a continuación
 	p_checkShotSuccess(EID, DIR, X, Y, AIMLIST),
 	
 	%% Elegir mensaje dependiendo de la calidad del francotirador para darle ánimos
@@ -117,7 +118,7 @@ p_checkShotSuccess(EID, DIR, X, Y, AIMLIST):-
 	%maplist(user:write, [MSG, AIM, '\n']),
 	
 	%% AÑADIDO: Seguir destruyendo entidades hasta que no quede ninguna en el punto de mira si hay más
-	contarApariencias(DIR, AIMLIST, COUNT),
+	'pl-man':contarApariencias(DIR, AIMLIST, COUNT),
 	( COUNT > 0 -> p_checkShotSuccess(EID, DIR, X, Y, AIMLIST)
 	           ; !      % Corta para que no salte el error de abajo
 	) .

@@ -29,7 +29,7 @@
 %%	
 %%	Prolog-pacman user programmed game.
 %%	
-:- module('pl-man', [ doAction/1, havingObject/0, havingObject/1, see/3, play/2, play/3, play/4, replay/2, contarApariencias/3]). % Procedimientos que se pueden llamar en el juego
+:- module('pl-man', [ doAction/1, havingObject/0, havingObject/1, see/3, play/2, play/3, play/4, replay/2]). % Procedimientos que se pueden llamar en el juego
 :- use_module('modules/cheeseEngine').
 :- use_module('modules/cheeseText').
 :- use_module('modules/cheeseTools').

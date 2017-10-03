@@ -13,6 +13,7 @@ load_behaviour(automaticTurret).
 
 load_behaviour(gunBasic).
 load_behaviour(companion).
+load_behaviour(portableTurret).
 map([
 ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
 ['#', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#'],
@@ -27,6 +28,13 @@ num_dots(70).
 pacman_start(7, 1).
 initMap:- 
 	addSolidObject('#'),
+
+	%% Prueba torreta portátil
+	createGameEntity(OID_PT, 'i', object, 8, 1, inactive, norule,
+		[name(compi), solid(false), static(false), use_rule(portableTurret),
+			description('Torreta portátil, lista para desplegar'), appearance(attribs(normal, green, default))]),
+	portableTurret(init, OID_PT, ['E','F'], [up,down,left,right], 2, []),
+
 	
 	%% Prueba compañero
 	createGameEntity(OID_CMP, 'ñ', object, 2, 3, active, companion,

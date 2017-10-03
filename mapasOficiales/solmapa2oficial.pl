@@ -19,30 +19,14 @@ m(D):- doAction(move(D)).
 g(D):- doAction(get(D)).
 u(D):- doAction(use(D)).
 
-
 % Comprobación desde arriba hasta arriba-izquierda
 todo(U, RU, R, RD, D, LD, L, LU):- s(up,U), s(right-up, RU), s(right,R),s(right-down,RD), s(down,D), s(left-down,LD),s(left,L), s(left-up,LU).
 
 % Avistar al menos una entidad sin importar la distancia
 avistar(DIR,OBJ):- see(list,DIR,LIST), nth0(_,LIST,OBJ).
 
-% Lo mismo que antes, pero devuelve la distancia más corta
+% Lo mismo que antes, pero devuelve la distancia más corta a la que se encuentre
 avistar(DIR,OBJ,DISTANCIA):- see(list,DIR,LIST), nth0(DISTANCIA,LIST,OBJ).
-
-/*% Devuelve la cantidad de apariencias de una entidad en una dirección
-contarApariencias(recursion, [], _, C, C).
-contarApariencias(recursion, [H|T], LS, C, I):-
-	( member(H,LS) -> NewCantidad is C+1
-	        ;  NewCantidad = C
-	),
-	contarApariencias(recursion, T, LS, NewCantidad, I).
-
-contarApariencias(DIR, LS, A):-
-	is_list(LS),
-	see(list,DIR,Lista),	
-	contarApariencias(recursion, Lista, LS, 0, A).
-
-% ---*/
 
 % Comprobar si existe la posibilidad de que puedan entrar entidades mortales en la dirección especificada
 safeMove(DIR, L_MORTAL):-
@@ -53,21 +37,24 @@ not(s(DIR,'#')), % Para agilizar, ya que este functor sirve para moverse
 
 forall(
 	member(ENEMY, L_MORTAL),
-		(
-			(not(s(DIR,ENEMY))), see(list,DIR,LIST), not(nth0(1,LIST,ENEMY)),
+	(
+		(not(s(DIR,ENEMY))), see(list,DIR,LIST), not(nth0(1,LIST,ENEMY)),
 
-			( DIR = up -> 
+		( DIR = up -> 
 			not(s(right-up,ENEMY)), not(s(left-up,ENEMY))
-			; ( DIR = right -> 
-			  not(s(right-up,ENEMY)), not(s(right-down,ENEMY))
-			  ; ( DIR = down -> 
+			; 
+			( DIR = right -> 
+				not(s(right-up,ENEMY)), not(s(right-down,ENEMY))
+				; 
+				( DIR = down -> 
 					not(s(right-down,ENEMY)), not(s(left-down,ENEMY))
-					; not(s(left-up,ENEMY)), not(s(left-down,ENEMY))
-					)
-			  )
-			)			
-		)
-	).
+					; 
+					not(s(left-up,ENEMY)), not(s(left-down,ENEMY))
+				)
+			)
+		)			
+	)
+).
 
 % Comprueba si @ está rodeado de algún enemigo de la lista, con lo cual quedándose quieto no morirá
 safeStand(L_MORTAL):-
@@ -79,7 +66,7 @@ forall(
 	)
 ).
 
-% Comprueba si @ está rodeado por 1 enemigo en 1 dirección, y la devuelve
+% Comprueba si @ está rodeado por 1 enemigo en 1 dirección, y devuelve dicha dirección
 flanked(DIR,ENEMY):-
 
 ( ( s(up,ENEMY), not(s(right,ENEMY)), not(s(down,ENEMY)), not(s(left,ENEMY)) ) ->
@@ -98,8 +85,10 @@ flanked(DIR,ENEMY):-
 	)			
 ).
 
-% REGLAS:
 
+%%% --- REGLAS: --- %%%
+
+% Principio de la partida, ir a coger el francotirador
 reg:- not(havingObject(appearance('L'))), s(left,'L'), g(left), obtenerArma(6), ce(areaIzquierda).
 reg:- not(havingObject(appearance('L'))), not(s(left,'L')), m(left).
 
@@ -109,7 +98,9 @@ reg:- flanked(DIR,'F'), not(flanked(_,'E')), havingObject(appearance('L')), u(DI
 
 reg:- m(none), write('none ').
 
-% -- Área izquierda --
+
+%%% -- Área izquierda -- %%%
+
 
 ai:- member(DIR,[down,left,up,right]), safeMove(DIR,['E','F']), s(DIR,'.'), m(DIR).
 ai:- todo('#','#','#','.',' ',' ',' ',' '), havingObject(appearance('L')), m(down).
@@ -118,23 +109,23 @@ ai:- todo('#','.','#',' ',' ',' ',' ',' '), havingObject(appearance('L')), m(dow
 ai:- todo(' ',' ','#','#','#',' ',' ',' '), havingObject(appearance('L')), m(up).
 ai:- todo(' ',' ',' ','#',' ',' ',' ',' '), havingObject(appearance('L')), m(up).
 ai:- todo(' ',' ',' ',' ',' ',' ',' ',' '), havingObject(appearance('L')), safeMove(left,['F']), m(left).
-ai:- todo(' ',' ',' ',' ',' ','#','#','#'), havingObject(appearance('L')), contarApariencias(right,['E'],COUNT), COUNT >= 8, u(right), actualizarBalas.
+ai:- todo(' ',' ',' ',' ',' ','#','#','#'), havingObject(appearance('L')), 'pl-man':contarApariencias(right,['E'],COUNT), COUNT >= 8, u(right), actualizarBalas.
 ai:- s(left,'#'), s(left-up,'#'), s(left-down,'#'), not(s(up,'#')), safeMove(up,['E','F']), s(up,' '), m(up).
 ai:- s(up,'#'), s(left-up,'#'), s(left,'#'), safeMove(right,['E','F']), m(right), ce(areaCentral).
 
 % Matar a F si está estorbando
 ai:- member(DIR,[down,left,up,right]), avistar(DIR,'F',DIST), DIST =< 1, havingObject(appearance('L')), u(DIR), actualizarBalas.
 
-% -- Área central --
 
-% Transición a la tercera parte (area derecha)
+%%% -- Área central -- %%%
+
+
+% Transición a la tercera parte (área derecha)
 ac:- todo('#','#',' ','#','#','#',' ',' '), safeMove(right, ['E','F']), m(right), ce(areaDerecha), writeln('Transición parte final, área derecha').
 
 %%
 % Reglas de movimiento específicas
 %%
-
-%% Casos para forzar limpiar la segunda parte del mapa:
 
 % La primera bajada, arriba del todo en el centro
 ac:- s(up,'#'), avistar(down,'#',DISTD), DISTD=8, avistar(right,'#',DISTR), DISTR=9, safeMove(down, ['E','F']), m(down).
@@ -168,14 +159,16 @@ ac:- safeMove(down,['E','F']), s(down,'.'), not(s(right,'.')), (not(s(right,'F')
 ac:- safeMove(up,['E','F']), s(up,'.'), not(s(right,'.')), (not(s(right,'F'));not(avistar(right,'.'))), not(s(left,'.')), (not(s(left,'F'));not(avistar(left,'.'))), not(s(down,'.')), (not(s(down,'F'));not(avistar(down,'.'))), m(up).
 
 %%
-% Reglas de supervivencia específicas (F nos la puede liar)
+% Reglas de supervivencia específicas (F nos puede dar problemas)
 %%
 ac:- safeStand(['E','F']), m(none).
 
 % Si avisto al fantasma en mi camino, lo mato (Aparta, malhechor)
 ac:- member(DIR,[down,left,up,right]), avistar(DIR,'F',DIST), DIST =< 1, havingObject(appearance('L')), u(DIR), actualizarBalas.
 
-% -- Área derecha --
+
+%%% -- Área derecha -- %%%
+
 
 % Salir del rincón (arriba y abajo)
 ad:- s(up,'#'), s(down,'#'), s(right,'#'), (not(s(left-up,'#'));not(s(left-down,'#'))), safeMove(left,['E','F']), m(left).
@@ -209,31 +202,20 @@ ad:- safeMove(down,['E','F']), avistar(down,'.'), m(down).
 ad:- safeMove(up,['E','F']), avistar(up,'.'), m(up).*/
 
 % Pasar de la punta izquierda al área derecha
-ad:- safeMove(right, ['E','F']), contarApariencias(right,['.'],COUNT), COUNT >= 6, m(right). 
+%ad:- safeMove(right, ['E','F']), 'pl-man':contarApariencias(right,['.'],COUNT), COUNT >= 6, m(right). 
 
 %%
-% Reglas de supervivencia específicas (F nos la puede liar)
+% Reglas de supervivencia específicas
 %%
 ad:- safeStand(['E','F']), m(none).
 
 % Si avisto al fantasma en mi camino, lo mato
 ad:- member(DIR,[down,left,up,right]), avistar(DIR,'F',DIST), DIST =< 1, havingObject(appearance('L')), u(DIR), actualizarBalas.
 
-/*
-reg:- havingObject, see(list,left,L), nth0(1,L,'E'), doAction(use(left)).
-reg:- havingObject, not(see(normal,up,'#')), doAction(move(up)).
-reg:- havingObject, see(normal,up,'#'), not(see(normal,right,'#')), doAction(move(right)).
-reg:- havingObject, see(normal,left,'E'), doAction(use(left)).
-reg:- see(normal,right,'L'), doAction(get(right)).
-reg:- not(see(normal,right,'L')), not(see(normal,right,'#')), doAction(move(right)).
-reg:- doAction(move(none)).
-*/
 
+%%% --- Reglas por defecto --- %%%
 
-rej:- estado(esperarAlineamiento), ea.
 rej:- estado(areaIzquierda), ai.
 rej:- estado(areaDerecha), ad.
 rej:- estado(areaCentral), ac.
-rej:- estado(fn), fn.
-rej:- estado(med), med.
 rej:- reg.

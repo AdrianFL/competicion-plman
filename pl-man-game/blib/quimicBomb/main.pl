@@ -174,7 +174,6 @@ gas(OID):-
 
 %Gas still on the map,
 gas(OID):-
-	%
 
 	% Añadido para la máscara de gas
 	'pl-man':entityType(PACMANID, pacman),
@@ -191,7 +190,7 @@ gas(OID):-
 	),
 
 	%% Los 3 ifs que determinan el dibujo del gas (actualización)
-		'pl-man':entityLocation(OID, _, _, Ap),
+		'pl-man':entityLocation(OID, _, _, _),
 		'pl-man':see(OID,normal,here, WHAT),
 		(WHAT = '.' -> CHARACTER = '*', NewAtr = bold, NewTC = yellow, NewBC = red 
 		; 
