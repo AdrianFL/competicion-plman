@@ -1,26 +1,48 @@
+////////////OBJETIVOS
+
+*-Hacer los 3 primeros mapas y resolverlos entre todos para estimación de tiempo.
+
+*-Hacer cartel de photoshop.
+
+-Mapas:
+	**1-(Adri)Las 3 habitaciones y el bosque.
+	**2-(Toni)Franco con oleadas.
+	**3-(Todos)Mapa del compañero.
+	4-Bomba química dispensadora con sabotaje.
+	5-Bomba química con máscara.
+	
+	Semifinal - Trincheras con bombardeo.
+
+	Final -Pasillo poco alto, torretas, semáforos, enemigos. 
+				-Jefe final, tanque armado.
+				-Ataque bombardeo, torretas, oleadas, y de to'.
+
+***-Corregir el documento final y añadir el sistema de rondas con tablita.
+
+////////////OBJETOS
+
 -----Bomba quimica (estatica, genera gas cada X tiempo)
 
 -> Pasos
 		(HECHO)- Cuenta atrás de la bomba química para explotar y liberar gases
 		(HECHO)- Generar gas alrededor de la bomba química
 		- Generarlo en un radio que atraviesa paredes
-		- Máscara de gas que impida morir del gas mientras se lleve
-			//opcional
 		(HECHO)- Hacer el gas expansivo
 		(HECHO // sin tener en cuenta objetos, solo cocos o vacío)- Que pinte los puntos de manera diferente para que se vean debajo, igual con objetos
 		- Diferentes tipos de gases
 		- Reactivación tras X tiempo
 
--Máscara de gas, permite sobrevivir al gas, es un objeto equipable (X turnos).
+(HECHO)-Máscara de gas, permite sobrevivir al gas, es un objeto equipable (X turnos).
 
 ----- Tanque armado: conjunto de enemigos de metal, que se mueven de lado a lado, con un punto débil. Dispara proyectiles que se marcan en el mapa con una X, y luego caen generando una explosión.
+
+
+
 (HECHO)- Enemigo normal que se mueve y dispara como el arquero.
 
 ------------ (COMPLICADO, para mapa de escape) Pistola que dispara como el arquero.
 
 (HECHO)-Pistola francotiradora: dispara y atraviesa enemigos
-
------------- (TANQUE) Enemigo con lanzacohetes.
 
 - Bombardeo aéreo
 	->Pasos:
@@ -35,5 +57,5 @@
 -Mapa de fuego de artillería, enemigos disparando disparando del frente.
 -Mapa de boss final con el tanque armado.
 -Mapa donde hay trincheras, y cada X turnos caen bombas. Te matan si no estás en la trinchera.
-,Mapa de compañero.
+-Mapa de compañero.
 
